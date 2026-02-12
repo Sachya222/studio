@@ -1,0 +1,41 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Happy college students on campus",
+      "imageUrl": "https://picsum.photos/seed/campus1/1200/800",
+      "imageHint": "college students campus"
+    },
+    {
+      "id": "book-listing",
+      "description": "Used textbook",
+      "imageUrl": "https://picsum.photos/seed/book1/400/300",
+      "imageHint": "used textbook"
+    },
+    {
+      "id": "electronics-listing",
+      "description": "Used laptop",
+      "imageUrl": "https://picsum.photos/seed/laptop1/400/300",
+      "imageHint": "laptop"
+    },
+    {
+      "id": "furniture-listing",
+      "description": "Dorm chair",
+      "imageUrl": "https://picsum.photos/seed/chair1/400/300",
+      "imageHint": "chair"
+    },
+    {
+      "id": "cycle-listing",
+      "description": "Bicycle",
+      "imageUrl": "https://picsum.photos/seed/bike1/400/300",
+      "imageHint": "bicycle"
+    },
+    {
+      "id": "user-avatar",
+      "description": "Student profile picture",
+      "imageUrl": "https://picsum.photos/seed/student1/200/200",
+      "imageHint": "student portrait"
+    }
+  ]
+}
