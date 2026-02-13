@@ -83,7 +83,8 @@ export default function Home() {
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-1 lg:rotate-3 transition-transform hover:rotate-0 duration-500">
                 <Image 
-                  src={heroImage?.imageUrl || ""} 
+                  src="/hero.jpg"
+ 
                   alt="Students on campus" 
                   width={600} 
                   height={400} 
