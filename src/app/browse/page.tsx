@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+
+const getImg = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || "";
 
 const mockListings = [
   {
@@ -27,7 +30,7 @@ const mockListings = [
     condition: "Like New",
     college: "State University",
     postedAt: "2h ago",
-    image: "https://picsum.photos/seed/book1/400/300"
+    image: getImg("book-listing")
   },
   {
     id: "2",
@@ -37,7 +40,7 @@ const mockListings = [
     condition: "Used",
     college: "Tech Institute",
     postedAt: "5h ago",
-    image: "https://picsum.photos/seed/mouse1/400/300"
+    image: getImg("mouse-listing")
   },
   {
     id: "3",
@@ -47,7 +50,7 @@ const mockListings = [
     condition: "Good",
     college: "State University",
     postedAt: "1d ago",
-    image: "https://picsum.photos/seed/lamp1/400/300"
+    image: getImg("lamp-listing")
   },
   {
     id: "4",
@@ -57,7 +60,7 @@ const mockListings = [
     condition: "Used",
     college: "Downtown College",
     postedAt: "3h ago",
-    image: "https://picsum.photos/seed/bike1/400/300"
+    image: getImg("cycle-listing")
   },
   {
     id: "5",
@@ -67,7 +70,7 @@ const mockListings = [
     condition: "Like New",
     college: "State University",
     postedAt: "6h ago",
-    image: "https://picsum.photos/seed/calc1/400/300"
+    image: getImg("calc-listing")
   },
   {
     id: "6",
@@ -77,7 +80,7 @@ const mockListings = [
     condition: "New",
     college: "West Campus",
     postedAt: "12h ago",
-    image: "https://picsum.photos/seed/box1/400/300"
+    image: getImg("box-listing")
   }
 ];
 

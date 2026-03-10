@@ -83,8 +83,7 @@ export default function Home() {
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-1 lg:rotate-3 transition-transform hover:rotate-0 duration-500">
                 <Image 
-                  src="/hero.jpg"
- 
+                  src={heroImage?.imageUrl || "https://picsum.photos/seed/campus1/600/400"}
                   alt="Students on campus" 
                   width={600} 
                   height={400} 
@@ -193,10 +192,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4 w-full max-w-md">
               {[
-                { label: "Items Reused", val: "12.4k+", icon: <Recycle /> },
-                { label: "CO2 Saved (kg)", val: "45k+", icon: <Globe /> },
-                { label: "Money Saved", val: "$150k+", icon: <Zap /> },
-                { label: "Active Campuses", val: "45+", icon: <Users /> }
+                { label: "Items Reused", val: "12.4k+", icon: <Recycle className="h-5 w-5" /> },
+                { label: "CO2 Saved (kg)", val: "45k+", icon: <Globe className="h-5 w-5" /> },
+                { label: "Money Saved", val: "$150k+", icon: <Zap className="h-5 w-5" /> },
+                { label: "Active Campuses", val: "45+", icon: <Users className="h-5 w-5" /> }
               ].map((stat, i) => (
                 <div key={i} className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 text-center space-y-2">
                   <div className="text-3xl font-bold font-headline">{stat.val}</div>

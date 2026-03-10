@@ -36,6 +36,30 @@
       "description": "Student profile picture",
       "imageUrl": "https://picsum.photos/seed/student1/200/200",
       "imageHint": "student portrait"
+    },
+    {
+      "id": "mouse-listing",
+      "description": "Logitech MX Master 3 Mouse",
+      "imageUrl": "https://picsum.photos/seed/master-mouse/400/300",
+      "imageHint": "computer mouse"
+    },
+    {
+      "id": "lamp-listing",
+      "description": "Dorm Desk Lamp",
+      "imageUrl": "https://picsum.photos/seed/lamp1/400/300",
+      "imageHint": "desk lamp"
+    },
+    {
+      "id": "calc-listing",
+      "description": "Graphic Calculator",
+      "imageUrl": "https://picsum.photos/seed/calc1/400/300",
+      "imageHint": "calculator"
+    },
+    {
+      "id": "box-listing",
+      "description": "Storage Cubes",
+      "imageUrl": "https://picsum.photos/seed/box1/400/300",
+      "imageHint": "storage box"
     }
   ]
 }
