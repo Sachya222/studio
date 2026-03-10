@@ -4,25 +4,25 @@
     {
       "id": "hero-bg",
       "description": "CampusCycle marketplace with students and items for sale",
-      "imageUrl": "https://picsum.photos/seed/campus-cycle-market/1200/800",
+      "imageUrl": "/projects/project.png",
       "imageHint": "campus marketplace"
     },
     {
       "id": "book-listing",
-      "description": "Used textbook",
-      "imageUrl": "https://picsum.photos/seed/book1/400/300",
+      "description": "engineering notebook",
+      "imageUrl": "/projects/software.png",
       "imageHint": "used textbook"
     },
     {
       "id": "electronics-listing",
       "description": "Used laptop",
-      "imageUrl": "https://picsum.photos/seed/laptop1/400/300",
+      "imageUrl": "/projects/laptop.png",
       "imageHint": "laptop"
     },
     {
       "id": "furniture-listing",
       "description": "Dorm chair",
-      "imageUrl": "https://picsum.photos/seed/chair1/400/300",
+      "imageUrl": "/projects/rent.png",
       "imageHint": "chair"
     },
     {
