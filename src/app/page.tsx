@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { 
   ArrowRight, 
   Recycle, 
@@ -14,7 +15,6 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { cn } from "@/lib/utils";
 
 const categories = [
   { name: "Books", icon: "📚", color: "bg-blue-100" },
@@ -84,12 +84,12 @@ export default function Home() {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-1 lg:rotate-3 transition-transform hover:rotate-0 duration-500">
                 <Image 
                   src={heroImage?.imageUrl || "https://picsum.photos/seed/campus1/600/400"}
-                  alt="Students on campus" 
+                  alt="CampusCycle marketplace" 
                   width={600} 
                   height={400} 
                   className="object-cover"
                   priority
-                  data-ai-hint="college students"
+                  data-ai-hint="campus marketplace"
                 />
               </div>
               

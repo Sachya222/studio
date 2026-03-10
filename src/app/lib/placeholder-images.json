@@ -3,9 +3,9 @@
   "placeholderImages": [
     {
       "id": "hero-bg",
-      "description": "Happy college students on campus",
-      "imageUrl": "https://picsum.photos/seed/campus1/1200/800",
-      "imageHint": "college students campus"
+      "description": "CampusCycle marketplace with students and items for sale",
+      "imageUrl": "https://picsum.photos/seed/campus-cycle-market/1200/800",
+      "imageHint": "campus marketplace"
     },
     {
       "id": "book-listing",
@@ -39,8 +39,8 @@
     },
     {
       "id": "mouse-listing",
-      "description": "Logitech MX Master 3 Mouse",
-      "imageUrl": "https://picsum.photos/seed/master-mouse/400/300",
+      "description": "High-quality master mouse",
+      "imageUrl": "https://picsum.photos/seed/master-mouse-pro/400/300",
       "imageHint": "computer mouse"
     },
     {
