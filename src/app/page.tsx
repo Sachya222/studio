@@ -9,9 +9,7 @@ import {
   ShieldCheck, 
   Zap, 
   Globe, 
-  Star,
-  Users,
-  Search
+  Users
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";

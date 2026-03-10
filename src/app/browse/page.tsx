@@ -40,7 +40,7 @@ const mockListings = [
     condition: "Used",
     college: "Tech Institute",
     postedAt: "5h ago",
-    image: getImg("mouse-listing")
+    image: getImg("electronics-listing")
   },
   {
     id: "3",
@@ -50,7 +50,7 @@ const mockListings = [
     condition: "Good",
     college: "State University",
     postedAt: "1d ago",
-    image: getImg("lamp-listing")
+    image: getImg("furniture-listing")
   },
   {
     id: "4",
@@ -70,7 +70,7 @@ const mockListings = [
     condition: "Like New",
     college: "State University",
     postedAt: "6h ago",
-    image: getImg("calc-listing")
+    image: getImg("electronics-listing")
   },
   {
     id: "6",

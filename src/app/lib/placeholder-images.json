@@ -40,14 +40,14 @@
     {
       "id": "mouse-listing",
       "description": "High-quality master mouse",
-      "imageUrl": "https://picsum.photos/seed/master-mouse-pro/400/300",
-      "imageHint": "computer mouse"
+      "imageUrl": "/projects/laptop.png",
+      "imageHint": "laptop"
     },
     {
       "id": "lamp-listing",
       "description": "Dorm Desk Lamp",
-      "imageUrl": "https://picsum.photos/seed/lamp1/400/300",
-      "imageHint": "desk lamp"
+      "imageUrl": "/projects/rent.png",
+      "imageHint": "chair"
     },
     {
       "id": "calc-listing",
