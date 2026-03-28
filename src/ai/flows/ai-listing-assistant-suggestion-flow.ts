@@ -44,10 +44,10 @@ const AIListingAssistantSuggestionOutputSchema = z.object({
       'Others',
     ])
     .describe('Suggested category for the product listing.'),
-  suggestedPrice: z.number().describe('Optimal selling price in USD for the item.'),
+  suggestedPrice: z.number().describe('Optimal selling price in INR (Indian Rupee) for the item.'),
   reasoning: z
     .string()
-    .describe('An explanation for the suggested category and price, considering the campus marketplace context.'),
+    .describe('An explanation for the suggested category and price, considering the Indian campus marketplace context at SRMU Barabanki.'),
 });
 export type AIListingAssistantSuggestionOutput = z.infer<
   typeof AIListingAssistantSuggestionOutputSchema
@@ -63,8 +63,8 @@ const suggestListingDetailsPrompt = ai.definePrompt({
   name: 'suggestListingDetailsPrompt',
   input: {schema: AIListingAssistantSuggestionInputSchema},
   output: {schema: AIListingAssistantSuggestionOutputSchema},
-  prompt: `You are an expert AI assistant for a campus marketplace named CampusCycle. Your task is to analyze product details and images to suggest an optimal selling price and an appropriate category.
-The marketplace is for college students to buy and sell second-hand items. Consider factors like item condition, typical student budgets, and demand within a university setting.
+  prompt: `You are an expert AI assistant for an Indian campus marketplace named CampusCycle at SRMU Barabanki. Your task is to analyze product details and images to suggest an optimal selling price in Indian Rupee (₹) and an appropriate category.
+The marketplace is for college students in India to buy and sell second-hand items. Consider factors like item condition, typical Indian student budgets, and demand within a university setting in Uttar Pradesh.
 
 Available categories are:
 - Books
@@ -83,7 +83,7 @@ Product Description: {{{description}}}
 {{media url=this}}
 {{/each}}
 
-Based on the provided information, suggest the most appropriate category and an optimal selling price for this item on a college campus marketplace. Also provide a brief reasoning for your suggestions.`,
+Based on the provided information, suggest the most appropriate category and an optimal selling price in ₹ (INR) for this item on an Indian college campus marketplace. Also provide a brief reasoning for your suggestions.`,
 });
 
 const aiListingAssistantSuggestionFlow = ai.defineFlow(

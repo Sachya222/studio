@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,8 @@ import {
   ShieldCheck, 
   Zap, 
   Globe, 
-  Users
+  Users,
+  IndianRupee
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -37,14 +37,14 @@ export default function Home() {
             <div className="flex-1 text-center lg:text-left space-y-8 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-medium text-sm border border-accent/20">
                 <Globe className="h-4 w-4" />
-                <span>Over 2,500kg CO2 saved this month</span>
+                <span>Helping SRMU Barabanki stay sustainable</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground leading-tight">
                 Buy. Sell. Recycle. <br />
-                <span className="text-primary">Within Your Campus.</span>
+                <span className="text-primary">At SRMU Barabanki.</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                The trusted marketplace exclusive to students. Verify with your college email and start trading second-hand essentials with peers you can trust.
+                The trusted marketplace exclusive to students. Verify with your college email and start trading second-hand essentials with peers at SRMU.
               </p>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                 <Link href="/browse">
@@ -71,7 +71,7 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="text-sm">
-                  <span className="font-bold">500+</span> Students active today
+                  <span className="font-bold">200+</span> Students active today
                 </div>
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function Home() {
                 <div className="flex items-center gap-2 text-accent font-bold mb-1">
                   <ShieldCheck className="h-5 w-5" /> Verified
                 </div>
-                <p className="text-xs text-muted-foreground">Only students with .edu emails can join.</p>
+                <p className="text-xs text-muted-foreground">Only SRMU students with .edu emails can join.</p>
               </div>
             </div>
           </div>
@@ -134,20 +134,20 @@ export default function Home() {
       <section className="py-24">
         <div className="container mx-auto px-4 text-center max-w-3xl mb-16">
           <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">The Smarter Way to Campus Life</h2>
-          <p className="text-muted-foreground">CampusCycle is built by students, for students. We focus on what matters to your university experience.</p>
+          <p className="text-muted-foreground">CampusCycle is built for SRMU students. We focus on what matters to your university experience in Barabanki.</p>
         </div>
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 title: "Student Verified",
-                desc: "No more random strangers. Every user is verified with their college email address for 100% campus security.",
+                desc: "No more random strangers. Every user is verified with their SRMU college email address for 100% campus security.",
                 icon: <ShieldCheck className="h-8 w-8 text-primary" />,
                 bg: "bg-blue-50"
               },
               {
                 title: "In-App Chat",
-                desc: "Real-time communication with sellers. Negotiate, ask for more photos, and fix meetup spots safely.",
+                desc: "Real-time communication with sellers. Negotiate, ask for more photos, and fix meetup spots safely on campus.",
                 icon: <Zap className="h-8 w-8 text-amber-500" />,
                 bg: "bg-amber-50"
               },
@@ -182,7 +182,7 @@ export default function Home() {
               </div>
               <h2 className="text-4xl font-headline font-bold">Making a Greener Campus Together</h2>
               <p className="text-primary-foreground/80 text-lg leading-relaxed">
-                By choosing to buy second-hand, our community has diverted thousands of items from landfills. Join us in building a more sustainable future for your university.
+                By choosing to buy second-hand, our SRMU community has diverted thousands of items from landfills. Join us in building a more sustainable future for our university.
               </p>
               <Link href="/about">
                 <Button variant="secondary" className="gap-2">Learn about our mission <ArrowRight className="h-4 w-4" /></Button>
@@ -190,10 +190,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4 w-full max-w-md">
               {[
-                { label: "Items Reused", val: "12.4k+", icon: <Recycle className="h-5 w-5" /> },
-                { label: "CO2 Saved (kg)", val: "45k+", icon: <Globe className="h-5 w-5" /> },
-                { label: "Money Saved", val: "$150k+", icon: <Zap className="h-5 w-5" /> },
-                { label: "Active Campuses", val: "45+", icon: <Users className="h-5 w-5" /> }
+                { label: "Items Reused", val: "5.4k+", icon: <Recycle className="h-5 w-5" /> },
+                { label: "CO2 Saved (kg)", val: "12k+", icon: <Globe className="h-5 w-5" /> },
+                { label: "Money Saved", val: "₹12L+", icon: <IndianRupee className="h-5 w-5" /> },
+                { label: "Active Users", val: "800+", icon: <Users className="h-5 w-5" /> }
               ].map((stat, i) => (
                 <div key={i} className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 text-center space-y-2">
                   <div className="text-3xl font-bold font-headline">{stat.val}</div>
@@ -211,7 +211,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto bg-secondary/50 rounded-3xl p-12 md:p-20 border-2 border-dashed border-primary/20 space-y-8">
             <h2 className="text-3xl md:text-5xl font-headline font-bold">Ready to Declutter Your Dorm?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of students saving money and the planet. Listing takes less than 2 minutes.
+              Join hundreds of SRMU students saving money and the planet. Listing takes less than 2 minutes.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/post">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -13,7 +12,8 @@ import {
   Clock, 
   Heart,
   MessageSquare,
-  ChevronDown
+  ChevronDown,
+  IndianRupee
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,62 +25,42 @@ const mockListings = [
   {
     id: "1",
     title: "Essential Organic Chemistry (2nd Ed)",
-    price: 35,
+    price: 850,
     category: "Books",
     condition: "Like New",
-    college: "State University",
+    college: "SRMU Barabanki",
     postedAt: "2h ago",
     image: getImg("book-listing")
   },
   {
     id: "2",
     title: "Logitech MX Master 3 Mouse",
-    price: 60,
+    price: 4500,
     category: "Electronics",
     condition: "Used",
-    college: "Tech Institute",
+    college: "SRMU Barabanki",
     postedAt: "5h ago",
     image: getImg("electronics-listing")
   },
   {
     id: "3",
     title: "Standard Dorm Desk Lamp",
-    price: 15,
+    price: 450,
     category: "Furniture",
     condition: "Good",
-    college: "State University",
+    college: "SRMU Barabanki",
     postedAt: "1d ago",
     image: getImg("furniture-listing")
   },
   {
     id: "4",
     title: "Raleigh City Cruiser Bike",
-    price: 120,
+    price: 5500,
     category: "Cycles",
     condition: "Used",
-    college: "Downtown College",
+    college: "SRMU Barabanki",
     postedAt: "3h ago",
     image: getImg("cycle-listing")
-  },
-  {
-    id: "5",
-    title: "TI-84 Plus Graphic Calculator",
-    price: 45,
-    category: "Electronics",
-    condition: "Like New",
-    college: "State University",
-    postedAt: "6h ago",
-    image: getImg("electronics-listing")
-  },
-  {
-    id: "6",
-    title: "Dorm Storage Cubes (Set of 4)",
-    price: 20,
-    category: "Hostel Essentials",
-    condition: "New",
-    college: "West Campus",
-    postedAt: "12h ago",
-    image: getImg("box-listing")
   }
 ];
 
@@ -107,7 +87,7 @@ export default function BrowsePage() {
             <SlidersHorizontal className="h-4 w-4" /> Filters
           </Button>
           <Button variant="outline" className="gap-2 rounded-full whitespace-nowrap">
-            University <ChevronDown className="h-4 w-4" />
+            Campus <ChevronDown className="h-4 w-4" />
           </Button>
           <Button variant="outline" className="gap-2 rounded-full whitespace-nowrap">
             Price <ChevronDown className="h-4 w-4" />
@@ -148,7 +128,9 @@ export default function BrowsePage() {
             </div>
             <CardHeader className="p-4 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-xl font-bold text-primary">${listing.price}</span>
+                <span className="text-xl font-bold text-primary flex items-center">
+                  <IndianRupee className="h-4 w-4" />{listing.price}
+                </span>
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
                   {listing.condition}
                 </span>

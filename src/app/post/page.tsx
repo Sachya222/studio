@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -23,7 +22,7 @@ import {
   AlertCircle,
   Recycle,
   Tag,
-  DollarSign
+  IndianRupee
 } from "lucide-react";
 import { aiListingAssistantSuggestion } from "@/ai/flows/ai-listing-assistant-suggestion-flow";
 import { useToast } from "@/hooks/use-toast";
@@ -40,7 +39,7 @@ export default function PostItemPage() {
     category: "",
     price: "",
     condition: "",
-    college: ""
+    college: "SRMU Barabanki"
   });
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,7 +125,7 @@ export default function PostItemPage() {
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="space-y-4 mb-8">
         <h1 className="text-3xl font-headline font-bold">List an Item</h1>
-        <p className="text-muted-foreground">Turn your unused items into cash and help other students.</p>
+        <p className="text-muted-foreground">Turn your unused items into cash and help other students at SRMU.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -141,7 +140,7 @@ export default function PostItemPage() {
                 <Label htmlFor="title">Product Title</Label>
                 <Input 
                   id="title" 
-                  placeholder="e.g. Calculus Early Transcendentals 8th Ed" 
+                  placeholder="e.g. Engineering Mathematics - I" 
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   required
@@ -251,7 +250,7 @@ export default function PostItemPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Our AI analyzes your photos and description to suggest values that help your item sell faster.
+                Our AI analyzes your photos and description to suggest values in ₹ (INR) that help your item sell faster.
               </p>
               <Button 
                 type="button" 
@@ -272,9 +271,9 @@ export default function PostItemPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Asking Price ($)</Label>
+                <Label htmlFor="price">Asking Price (₹)</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <IndianRupee className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
                     id="price" 
                     placeholder="0.00" 
@@ -289,7 +288,7 @@ export default function PostItemPage() {
                 <Label htmlFor="college">Pickup Campus</Label>
                 <Input 
                   id="college" 
-                  placeholder="e.g. Harvard University" 
+                  placeholder="e.g. SRMU Barabanki" 
                   value={formData.college}
                   onChange={(e) => setFormData({...formData, college: e.target.value})}
                   required
@@ -307,7 +306,7 @@ export default function PostItemPage() {
               <span>Sustainability Tip</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Donating a percentage of your proceeds to campus green funds increases your sustainability rating!
+              Selling locally at SRMU prevents unnecessary transport emissions and helps our campus ecosystem!
             </p>
           </div>
         </div>
