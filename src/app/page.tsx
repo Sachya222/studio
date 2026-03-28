@@ -37,11 +37,11 @@ export default function Home() {
             <div className="flex-1 text-center lg:text-left space-y-8 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-medium text-sm border border-accent/20">
                 <Globe className="h-4 w-4" />
-                <span>Helping SRMU Barabanki stay sustainable</span>
+                <span>Helping SRMU Lucknow stay sustainable</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground leading-tight">
                 Buy. Sell. Recycle. <br />
-                <span className="text-primary">At SRMU Barabanki.</span>
+                <span className="text-primary">At SRMU Lucknow.</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 The trusted marketplace exclusive to students. Verify with your college email and start trading second-hand essentials with peers at SRMU.
@@ -134,7 +134,7 @@ export default function Home() {
       <section className="py-24">
         <div className="container mx-auto px-4 text-center max-w-3xl mb-16">
           <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">The Smarter Way to Campus Life</h2>
-          <p className="text-muted-foreground">CampusCycle is built for SRMU students. We focus on what matters to your university experience in Barabanki.</p>
+          <p className="text-muted-foreground">CampusCycle is built for SRMU students. We focus on what matters to your university experience in Lucknow.</p>
         </div>
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

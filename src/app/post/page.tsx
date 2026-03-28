@@ -39,7 +39,7 @@ export default function PostItemPage() {
     category: "",
     price: "",
     condition: "",
-    college: "SRMU Barabanki"
+    college: "SRMU Lucknow"
   });
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -288,7 +288,7 @@ export default function PostItemPage() {
                 <Label htmlFor="college">Pickup Campus</Label>
                 <Input 
                   id="college" 
-                  placeholder="e.g. SRMU Barabanki" 
+                  placeholder="e.g. SRMU Lucknow" 
                   value={formData.college}
                   onChange={(e) => setFormData({...formData, college: e.target.value})}
                   required

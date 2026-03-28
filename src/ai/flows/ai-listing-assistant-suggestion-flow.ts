@@ -47,7 +47,7 @@ const AIListingAssistantSuggestionOutputSchema = z.object({
   suggestedPrice: z.number().describe('Optimal selling price in INR (Indian Rupee) for the item.'),
   reasoning: z
     .string()
-    .describe('An explanation for the suggested category and price, considering the Indian campus marketplace context at SRMU Barabanki.'),
+    .describe('An explanation for the suggested category and price, considering the Indian campus marketplace context at SRMU Lucknow.'),
 });
 export type AIListingAssistantSuggestionOutput = z.infer<
   typeof AIListingAssistantSuggestionOutputSchema
@@ -63,7 +63,7 @@ const suggestListingDetailsPrompt = ai.definePrompt({
   name: 'suggestListingDetailsPrompt',
   input: {schema: AIListingAssistantSuggestionInputSchema},
   output: {schema: AIListingAssistantSuggestionOutputSchema},
-  prompt: `You are an expert AI assistant for an Indian campus marketplace named CampusCycle at SRMU Barabanki. Your task is to analyze product details and images to suggest an optimal selling price in Indian Rupee (₹) and an appropriate category.
+  prompt: `You are an expert AI assistant for an Indian campus marketplace named CampusCycle at SRMU Lucknow. Your task is to analyze product details and images to suggest an optimal selling price in Indian Rupee (₹) and an appropriate category.
 The marketplace is for college students in India to buy and sell second-hand items. Consider factors like item condition, typical Indian student budgets, and demand within a university setting in Uttar Pradesh.
 
 Available categories are:

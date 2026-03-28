@@ -28,7 +28,7 @@ const mockListings = [
     price: 850,
     category: "Books",
     condition: "Like New",
-    college: "SRMU Barabanki",
+    college: "SRMU Lucknow",
     postedAt: "2h ago",
     image: getImg("book-listing")
   },
@@ -38,7 +38,7 @@ const mockListings = [
     price: 4500,
     category: "Electronics",
     condition: "Used",
-    college: "SRMU Barabanki",
+    college: "SRMU Lucknow",
     postedAt: "5h ago",
     image: getImg("electronics-listing")
   },
@@ -48,7 +48,7 @@ const mockListings = [
     price: 450,
     category: "Furniture",
     condition: "Good",
-    college: "SRMU Barabanki",
+    college: "SRMU Lucknow",
     postedAt: "1d ago",
     image: getImg("furniture-listing")
   },
@@ -58,7 +58,7 @@ const mockListings = [
     price: 5500,
     category: "Cycles",
     condition: "Used",
-    college: "SRMU Barabanki",
+    college: "SRMU Lucknow",
     postedAt: "3h ago",
     image: getImg("cycle-listing")
   }
