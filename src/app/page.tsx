@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,13 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const categories = [
   { name: "Books", icon: "📚", color: "bg-blue-100" },
@@ -26,7 +34,11 @@ const categories = [
 ];
 
 export default function Home() {
-  const heroImage = PlaceHolderImages.find(img => img.id === "hero-bg");
+  const heroCarousel = [
+    PlaceHolderImages.find(img => img.id === "hero-carousel-1"),
+    PlaceHolderImages.find(img => img.id === "hero-bg"),
+    PlaceHolderImages.find(img => img.id === "hero-carousel-3"),
+  ].filter((img): img is NonNullable<typeof img> => !!img);
 
   return (
     <div className="flex flex-col w-full">
@@ -79,20 +91,37 @@ export default function Home() {
             <div className="flex-1 relative w-full max-w-xl">
               <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-1 lg:rotate-3 transition-transform hover:rotate-0 duration-500">
-                <Image 
-                  src={heroImage?.imageUrl || "https://picsum.photos/seed/campus1/600/400"}
-                  alt="CampusCycle marketplace" 
-                  width={600} 
-                  height={400} 
-                  className="object-cover"
-                  priority
-                  data-ai-hint="campus marketplace"
-                />
+              
+              <div className="relative group">
+                <Carousel 
+                  className="w-full"
+                  opts={{
+                    loop: true,
+                  }}
+                >
+                  <CarouselContent>
+                    {heroCarousel.map((img, idx) => (
+                      <CarouselItem key={idx}>
+                        <div className="relative aspect-[3/2] rounded-2xl overflow-hidden shadow-2xl border-4 border-white transition-all duration-500">
+                          <Image 
+                            src={img.imageUrl}
+                            alt={img.description} 
+                            fill
+                            className="object-cover"
+                            priority={idx === 0}
+                            data-ai-hint={img.imageHint}
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Carousel>
               </div>
               
               {/* Floating feature card */}
-              <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-xl shadow-xl border hidden md:block max-w-[200px] animate-bounce">
+              <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-xl shadow-xl border hidden md:block max-w-[200px] z-20 animate-bounce">
                 <div className="flex items-center gap-2 text-accent font-bold mb-1">
                   <ShieldCheck className="h-5 w-5" /> Verified
                 </div>
