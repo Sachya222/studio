@@ -34,7 +34,7 @@ const mockListings = [
   },
   {
     id: "2",
-    title: "Logitech MX Master 3 Mouse",
+    title: "lenovo thinkpad 2018 model",
     price: 4500,
     category: "Electronics",
     condition: "Used",
