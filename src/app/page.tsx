@@ -34,9 +34,10 @@ const categories = [
 ];
 
 export default function Home() {
+  // Ordered as: 1. Main provided image (hero-bg), 2. Campus vibe, 3. Students sharing
   const heroCarousel = [
-    PlaceHolderImages.find(img => img.id === "hero-carousel-1"),
     PlaceHolderImages.find(img => img.id === "hero-bg"),
+    PlaceHolderImages.find(img => img.id === "hero-carousel-1"),
     PlaceHolderImages.find(img => img.id === "hero-carousel-3"),
   ].filter((img): img is NonNullable<typeof img> => !!img);
 
