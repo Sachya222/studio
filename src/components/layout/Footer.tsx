@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { Recycle, Github, Twitter, Instagram, Mail } from "lucide-react";
 
@@ -25,10 +24,10 @@ export function Footer() {
           <div>
             <h4 className="font-headline font-semibold mb-4">Marketplace</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/browse" className="hover:text-primary">All Listings</Link></li>
-              <li><Link href="/browse?category=Books" className="hover:text-primary">Books</Link></li>
-              <li><Link href="/browse?category=Electronics" className="hover:text-primary">Electronics</Link></li>
-              <li><Link href="/browse?category=Furniture" className="hover:text-primary">Furniture</Link></li>
+              <li><Link href="/browsegillu" className="hover:text-primary">All Listings</Link></li>
+              <li><Link href="/browsegillu?category=Books" className="hover:text-primary">Books</Link></li>
+              <li><Link href="/browsegillu?category=Electronics" className="hover:text-primary">Electronics</Link></li>
+              <li><Link href="/browsegillu?category=Furniture" className="hover:text-primary">Furniture</Link></li>
             </ul>
           </div>
 

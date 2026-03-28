@@ -1,11 +1,9 @@
-
 "use client";
 
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  Search, 
   PlusCircle, 
   MessageSquare, 
   Heart, 
@@ -33,7 +31,7 @@ export function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/browse" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href="/browsegillu" className="text-sm font-medium hover:text-primary transition-colors">
               Browse
             </Link>
             <Link href="/how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
@@ -85,7 +83,7 @@ export function Navbar() {
         isOpen ? "max-h-96 py-4" : "max-h-0"
       )}>
         <div className="flex flex-col gap-4 px-4">
-          <Link href="/browse" className="text-lg font-medium">Browse Listings</Link>
+          <Link href="/browsegillu" className="text-lg font-medium">Browse Listings</Link>
           <Link href="/how-it-works" className="text-lg font-medium">How it works</Link>
           <Link href="/about" className="text-lg font-medium">Sustainability</Link>
           <Link href="/post" className="w-full">

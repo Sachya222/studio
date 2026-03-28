@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -60,7 +59,7 @@ export default function Home() {
                 The trusted marketplace exclusive to students. Verify with your college email and start trading second-hand essentials with peers at SRMU.
               </p>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                <Link href="/browse">
+                <Link href="/browsegillu">
                   <Button size="lg" className="h-14 px-8 text-lg gap-2">
                     Browse Items <ArrowRight className="h-5 w-5" />
                   </Button>
@@ -141,13 +140,13 @@ export default function Home() {
               <h2 className="text-3xl font-headline font-bold">Explore Categories</h2>
               <p className="text-muted-foreground">Find exactly what you need for your hostel or course.</p>
             </div>
-            <Link href="/browse" className="text-primary font-medium hover:underline flex items-center gap-1">
+            <Link href="/browsegillu" className="text-primary font-medium hover:underline flex items-center gap-1">
               View all <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {categories.map((cat) => (
-              <Link key={cat.name} href={`/browse?category=${cat.name}`}>
+              <Link key={cat.name} href={`/browsegillu?category=${cat.name}`}>
                 <Card className="hover:border-primary transition-all hover:-translate-y-1 cursor-pointer group">
                   <CardContent className="p-6 flex flex-col items-center justify-center text-center gap-3">
                     <span className={cn("text-3xl p-3 rounded-xl transition-colors", cat.color)}>{cat.icon}</span>

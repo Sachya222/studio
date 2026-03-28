@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -12,7 +11,6 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -154,7 +152,7 @@ export default function HowItWorksPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/browse">
+              <Link href="/browsegillu">
                 <Button variant="outline" size="lg" className="gap-2 border-2">Start Browsing <ArrowRight className="h-4 w-4" /></Button>
               </Link>
             </div>
@@ -202,7 +200,7 @@ export default function HowItWorksPage() {
               <Link href="/post">
                 <Button size="lg" className="px-12">Sell Something</Button>
               </Link>
-              <Link href="/browse">
+              <Link href="/browsegillu">
                 <Button variant="outline" size="lg" className="px-12">Explore Items</Button>
               </Link>
             </div>
