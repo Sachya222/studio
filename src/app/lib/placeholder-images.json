@@ -4,13 +4,13 @@
     {
       "id": "hero-carousel-1",
       "description": "Lively campus marketplace scene with students browsing items",
-      "imageUrl": "https://picsum.photos/seed/campus-vibe/600/400",
+      "imageUrl": "/projects/project.png",
       "imageHint": "campus marketplace"
     },
     {
       "id": "hero-bg",
       "description": "CampusCycle marketplace with squirrel mascot and items for sale",
-      "imageUrl": "/projects/project.png",
+      "imageUrl": "/projects/gillu.png",
       "imageHint": "campus marketplace"
     },
     {

@@ -24,7 +24,7 @@ const getImg = (id: string) => PlaceHolderImages.find(img => img.id === id)?.ima
 const mockListings = [
   {
     id: "1",
-    title: "Essential Organic Chemistry (2nd Ed)",
+    title: "Engineering mathmatics 4th sem",
     price: 850,
     category: "Books",
     condition: "Like New",
