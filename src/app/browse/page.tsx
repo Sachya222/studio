@@ -45,7 +45,7 @@ const mockListings = [
   {
     id: "3",
     title: "Pg Furniture set",
-    price: 450,
+    price: 6999,
     category: "Furniture",
     condition: "Good",
     college: "SRMU Lucknow",
