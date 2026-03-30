@@ -54,7 +54,7 @@ const mockListings = [
   },
   {
     id: "4",
-    title: "Raleigh City Cruiser Bike",
+    title: "cycles",
     price: 5500,
     category: "Cycles",
     condition: "Used",
