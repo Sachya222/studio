@@ -35,7 +35,7 @@
     {
       "id": "cycle-listing",
       "description": "Bicycle",
-      "imageUrl": "https://picsum.photos/seed/bike1/400/300",
+      "imageUrl": "/projects/olx.png",
       "imageHint": "bicycle"
     },
     {
