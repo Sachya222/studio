@@ -13,12 +13,7 @@
       "imageUrl": "/projects/gillu.png",
       "imageHint": "campus marketplace"
     },
-    {
-      "id": "hero-carousel-3",
-      "description": "Students sharing and recycling items in a campus hub",
-      "imageUrl": "https://picsum.photos/seed/students-share/600/400",
-      "imageHint": "students sharing"
-    },
+    
     {
       "id": "book-listing",
       "description": "engineering notebook",
