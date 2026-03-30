@@ -54,7 +54,7 @@ const mockListings = [
   },
   {
     id: "4",
-    title: "A1 cycle one year old",
+    title: "A1 Bicycle one year old",
     price: 2000,
     category: "Cycles",
     condition: "Used",
