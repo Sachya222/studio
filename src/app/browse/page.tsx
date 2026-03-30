@@ -44,7 +44,7 @@ const mockListings = [
   },
   {
     id: "3",
-    title: "Standard Dorm Desk Lamp",
+    title: "Pg Furniture set",
     price: 450,
     category: "Furniture",
     condition: "Good",
