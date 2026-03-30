@@ -55,7 +55,7 @@ const mockListings = [
   {
     id: "4",
     title: "cycles",
-    price: 5500,
+    price: 2000,
     category: "Cycles",
     condition: "Used",
     college: "SRMU Lucknow",
