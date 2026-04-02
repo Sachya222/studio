@@ -33,11 +33,9 @@ const categories = [
 ];
 
 export default function Home() {
-  // Ordered as: 1. Main provided image (hero-bg), 2. Campus vibe, 3. Students sharing
+  // Ordered as: 1. Main provided image (hero-bg)
   const heroCarousel = [
     PlaceHolderImages.find(img => img.id === "hero-bg"),
-    PlaceHolderImages.find(img => img.id === "hero-carousel-1"),
-    PlaceHolderImages.find(img => img.id === "hero-carousel-3"),
   ].filter((img): img is NonNullable<typeof img> => !!img);
 
   return (
@@ -115,8 +113,12 @@ export default function Home() {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {heroCarousel.length > 1 && (
+                    <>
+                      <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </>
+                  )}
                 </Carousel>
               </div>
               
