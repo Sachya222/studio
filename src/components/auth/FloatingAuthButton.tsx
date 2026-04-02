@@ -8,7 +8,8 @@ import {
   LogOut, 
   ShoppingBag,
   UserCircle,
-  Loader2
+  Loader2,
+  PlusCircle
 } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { AuthModal } from "./AuthModal";
@@ -38,8 +39,6 @@ export function FloatingAuthButton() {
   const [mounted, setMounted] = useState(false);
 
   // Use useEffect to determine when the component has mounted on the client.
-  // This is the standard pattern for avoiding hydration errors in Next.js
-  // when rendering content that depends on client-only state (like Firebase Auth).
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -61,8 +60,6 @@ export function FloatingAuthButton() {
     }
   };
 
-  // To prevent hydration mismatches, the server-rendered HTML and the first 
-  // client-side render must match exactly. We force a 'loading' state for both.
   if (!mounted || isUserLoading) {
     return (
       <div className="fixed bottom-8 right-8 z-[60]">
@@ -77,9 +74,18 @@ export function FloatingAuthButton() {
     );
   }
 
-  // Once hydrated and auth state is determined, render the interactive UI.
   return (
-    <div className="fixed bottom-8 right-8 z-[60]">
+    <div className="fixed bottom-8 right-8 z-[60] flex flex-col items-end gap-4">
+      {user && (
+        <Link href="/post">
+          <Button 
+            className="h-12 px-6 rounded-full shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold gap-2 border-2 border-white transition-all hover:scale-105"
+          >
+            <PlusCircle className="h-5 w-5" /> Sell Item
+          </Button>
+        </Link>
+      )}
+      
       {user ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -95,30 +101,33 @@ export function FloatingAuthButton() {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 p-2">
+          <DropdownMenuContent align="end" className="w-64 p-2 shadow-2xl rounded-xl border-2">
             <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
+              <div className="flex flex-col space-y-1 p-2">
                 <p className="text-sm font-bold leading-none">{user.displayName}</p>
                 <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <Link href="/profile">
-              <DropdownMenuItem className="cursor-pointer gap-2">
-                <UserCircle className="w-4 h-4" /> Profile
+              <DropdownMenuItem className="cursor-pointer gap-3 p-3 rounded-lg">
+                <UserCircle className="w-5 h-5 text-primary" /> 
+                <span className="font-medium">My Profile</span>
               </DropdownMenuItem>
             </Link>
             <Link href="/my-listings">
-              <DropdownMenuItem className="cursor-pointer gap-2">
-                <ShoppingBag className="w-4 h-4" /> My Listings
+              <DropdownMenuItem className="cursor-pointer gap-3 p-3 rounded-lg">
+                <ShoppingBag className="w-5 h-5 text-primary" /> 
+                <span className="font-medium">My Listings</span>
               </DropdownMenuItem>
             </Link>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
-              className="cursor-pointer gap-2 text-destructive focus:text-destructive" 
+              className="cursor-pointer gap-3 p-3 rounded-lg text-destructive focus:text-destructive focus:bg-destructive/5" 
               onClick={handleLogout}
             >
-              <LogOut className="w-4 h-4" /> Log Out
+              <LogOut className="w-5 h-5" /> 
+              <span className="font-medium">Log Out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
