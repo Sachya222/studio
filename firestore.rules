@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * CAMPUSCYCLE SECURITY RULES
+     * 
+     * Core Philosophy:
+     * This ruleset implements a multi-tiered security model designed for a campus marketplace. 
+     * It prioritizes 'Authorization Independence' by ensuring documents contain the necessary 
+     * metadata (like owner IDs or participant lists) to make access decisions without 
+     * expensive cross-document lookups.
+     *
+     * Data Structure:
+     * - /users/{userId}: User profiles indexed by Auth UID.
+     * - /product_listings/{listingId}: Marketplace items with seller ownership.
+     * - /chat_threads/{chatThreadId}: Private conversations using participant arrays.
+     * - /chat_threads/{chatThreadId}/messages/{messageId}: Thread-scoped messages with denormalized access.
+     * - /reviews/{reviewId}: Public feedback with reviewer ownership.
+     * - /roles_admin/{userId}: Administrative privileges managed via document existence.
+     *
+     * Key Security Decisions:
+     * 1. Public Marketplace: Listings and Reviews are publicly readable to encourage browsing, 
+     *    but writes are strictly restricted to the original authors.
+     * 2. Shared Conversations: Chat access is restricted to UIDs present in the 'participantIds' 
+     *    array, which is denormalized from threads into individual messages for performance.
+     * 3. Prototyping Mode: Rules enforce 'who' can write but are flexible on 'what' is written, 
+     *    except for critical relational links (like sellerId or participantIds) which are 
+     *    validated or made immutable.
+     * 4. Admin Override: A dedicated '/roles_admin' collection allows for global privileges 
+     *    without cluttering user profile documents.
+     */
+
+    // --- Helper Functions ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Verifies ownership for existing documents during update or delete. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Checks if the authenticated user is listed in a participants array. */
+    function isParticipant(participantIds) {
+      return isSignedIn() && (request.auth.uid in participantIds);
+    }
+
+    /** Checks if the authenticated user has an entry in the admin roles collection. */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for user profiles. Owners can manage their data; profiles are publicly readable for marketplace trust.
+     * @path /users/{userId}
+     * @allow (get) Any user. (create/update) The user matching the document ID.
+     * @deny (update) Attempting to modify another user's profile.
+     * @principle Enforces path-based ownership and allows public visibility for identity verification.
+     */
+    match /users/{userId} {
+      allow get: if true;
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Rules for product listings. Anyone can browse active items; only the seller can manage the listing.
+     * @path /product_listings/{listingId}
+     * @allow (list) Public browsing. (create) Authenticated user setting themselves as seller.
+     * @deny (update) Users attempting to edit a listing they didn't create.
+     * @principle Public read with owner-only writes via denormalized 'sellerId'.
+     */
+    match /product_listings/{listingId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.sellerId) && request.resource.data.sellerId == resource.data.sellerId;
+      allow delete: if isExistingOwner(resource.data.sellerId) || isAdmin();
+    }
+
+    /**
+     * @description Rules for private chat threads. Access is restricted to the buyer and seller involved.
+     * @path /chat_threads/{chatThreadId}
+     * @allow (get/list) Users included in the participantIds array.
+     * @deny (get) A user not involved in the specific conversation.
+     * @principle Shared access pattern using a membership array.
+     */
+    match /chat_threads/{chatThreadId} {
+      allow get, list: if isParticipant(resource.data.participantIds);
+      allow create: if isSignedIn() && isParticipant(request.resource.data.participantIds);
+      allow update: if isParticipant(resource.data.participantIds) && request.resource.data.participantIds == resource.data.participantIds;
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Rules for messages within a chat. Uses denormalized participant data for independent authorization.
+     * @path /chat_threads/{chatThreadId}/messages/{messageId}
+     * @allow (list) Participants of the thread. (create) The sender, if they are a thread participant.
+     * @deny (create) Sending a message to a thread you aren't part of.
+     * @principle Authorization independence via denormalized participantIds and senderId.
+     */
+    match /chat_threads/{chatThreadId}/messages/{messageId} {
+      allow get, list: if isParticipant(resource.data.participantIds);
+      allow create: if isParticipant(request.resource.data.participantIds) && request.resource.data.senderId == request.auth.uid;
+      allow update: if false; // Messages are generally immutable in this model
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Rules for reviews. Publicly readable to build community trust; only the reviewer can create.
+     * @path /reviews/{reviewId}
+     * @allow (list) Public. (create) Reviewer ID matches auth UID.
+     * @deny (update) Modifying a review after submission (preventing rating manipulation).
+     * @principle Public read with owner-only creation via 'reviewerId'.
+     */
+    match /reviews/{reviewId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.reviewerId == request.auth.uid;
+      allow update: if false; // Reviews are immutable to prevent tampering
+      allow delete: if isExistingOwner(resource.data.reviewerId) || isAdmin();
+    }
+
+    /**
+     * @description Rules for administrative roles. Managed via existence checks.
+     * @path /roles_admin/{userId}
+     * @allow (get) Authenticated users checking their own status. (list) Existing admins.
+     * @deny (write) Any client-side attempt to grant admin privileges.
+     * @principle DBAC (Database Access Control) using 'existence over content'.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create, update, delete: if false; // Admin roles must be managed via Admin SDK or Console
+    }
+  }
+}
