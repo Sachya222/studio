@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,18 +19,25 @@ import {
   X, 
   Sparkles, 
   Loader2, 
-  CheckCircle2, 
   AlertCircle,
   Recycle,
-  Tag,
   IndianRupee
 } from "lucide-react";
 import { aiListingAssistantSuggestion } from "@/ai/flows/ai-listing-assistant-suggestion-flow";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { useUser, useFirestore, useStorage } from "@/firebase";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { collection, doc } from "firebase/firestore";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function PostItemPage() {
   const { toast } = useToast();
+  const router = useRouter();
+  const { user } = useUser();
+  const db = useFirestore();
+  const storage = useStorage();
+  
   const [loading, setLoading] = useState(false);
   const [aiSuggesting, setAiSuggesting] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -107,18 +115,75 @@ export default function PostItemPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to post a listing.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (images.length === 0) {
+      toast({
+        title: "Photos Required",
+        description: "Please add at least one photo of your item.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      const imageUrls: string[] = [];
+      const listingId = doc(collection(db, "product_listings")).id;
+
+      for (let i = 0; i < images.length; i++) {
+        const imageRef = ref(storage, `listings/${listingId}/image_${i}`);
+        await uploadString(imageRef, images[i], 'data_url');
+        const downloadUrl = await getDownloadURL(imageRef);
+        imageUrls.push(downloadUrl);
+      }
+
+      const listingRef = doc(db, "product_listings", listingId);
+      const listingData = {
+        id: listingId,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        price: parseFloat(formData.price),
+        condition: formData.condition,
+        collegeLocation: formData.college,
+        imageUrls: imageUrls,
+        sellerId: user.uid,
+        postedDate: new Date().toISOString(),
+        status: "active",
+        userName: user.displayName,
+        userEmail: user.email
+      };
+
+      setDocumentNonBlocking(listingRef, listingData, { merge: true });
+
       toast({
         title: "Success!",
         description: "Your item is now live on CampusCycle.",
       });
-      // Reset form...
-    }, 1500);
+      
+      router.push("/browsegillu");
+    } catch (error) {
+      console.error("Error posting listing:", error);
+      toast({
+        title: "Upload Failed",
+        description: "Something went wrong while publishing your listing.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -231,7 +296,6 @@ export default function PostItemPage() {
           </Card>
 
           <div className="flex justify-end gap-4">
-            <Button variant="outline" type="button">Save Draft</Button>
             <Button size="lg" disabled={loading} className="gap-2 px-8">
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               Publish Listing
