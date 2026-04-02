@@ -73,7 +73,7 @@ export default function AboutPage() {
                 It all started in a my friend room in 2023. , Me and friend, were shocked by the amount of perfectly good furniture and textbooks thrown into campus dumpsters at the end of every semester.
               </p>
               <p>
-                Alex needed a mini-fridge, and Jamie was throwing one away. They were in the same building, but had no way of knowing. That's when the idea for CampusCycle was born.
+                Niraj needed a mini-fridge, and Aman was throwing one away. They were in the same building, but had no way of knowing. That's when the idea for CampusCycle was born.
               </p>
               <p>
                 Today, CampusCycle serves over 40 universities, helping students save money while fostering a culture of reuse that protects our planet.
