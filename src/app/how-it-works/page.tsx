@@ -1,3 +1,4 @@
+
 "use client";
 
 import { 
@@ -13,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const steps = [
   {
@@ -42,6 +44,8 @@ const steps = [
 ];
 
 export default function HowItWorksPage() {
+  const getImg = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || "";
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -90,7 +94,7 @@ export default function HowItWorksPage() {
                 <PlusCircle className="h-4 w-4" />
                 <span>For Sellers</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">Declutter your dorm in minutes</h2>
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">Recycle your items in minutes</h2>
               <ul className="space-y-4">
                 {[
                   "Take 3 quick photos of your item",
@@ -110,7 +114,7 @@ export default function HowItWorksPage() {
             </div>
             <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border-8 border-secondary">
               <Image 
-                src="https://picsum.photos/seed/seller1/800/600" 
+                src={getImg("seller-how-to")} 
                 alt="Student selling items" 
                 fill 
                 className="object-cover"
@@ -126,7 +130,7 @@ export default function HowItWorksPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1 relative aspect-video rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
               <Image 
-                src="https://picsum.photos/seed/buyer1/800/600" 
+                src={getImg("buyer-how-to")} 
                 alt="Student browsing items" 
                 fill 
                 className="object-cover"

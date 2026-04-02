@@ -13,7 +13,6 @@
       "imageUrl": "/projects/gillu.png",
       "imageHint": "campus marketplace"
     },
-    
     {
       "id": "book-listing",
       "description": "engineering notebook",
@@ -67,6 +66,18 @@
       "description": "Storage Cubes",
       "imageUrl": "https://picsum.photos/seed/box1/400/300",
       "imageHint": "storage box"
+    },
+    {
+      "id": "seller-how-to",
+      "description": "Student selling items",
+      "imageUrl": "https://picsum.photos/seed/seller/800/450",
+      "imageHint": "student dorm"
+    },
+    {
+      "id": "buyer-how-to",
+      "description": "Student browsing items",
+      "imageUrl": "https://picsum.photos/seed/buyer/800/450",
+      "imageHint": "student laptop"
     }
   ]
 }
