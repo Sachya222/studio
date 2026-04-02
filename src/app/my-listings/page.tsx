@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, where, orderBy } from "firebase/firestore";
+import { collection, query, where, orderBy, limit } from "firebase/firestore";
 import { 
   Card, 
   CardContent, 
@@ -44,7 +45,8 @@ export default function MyListingsPage() {
     return query(
       collection(db, "product_listings"),
       where("sellerId", "==", user.uid),
-      orderBy("postedDate", "desc")
+      orderBy("postedDate", "desc"),
+      limit(50)
     );
   }, [db, user?.uid]);
 
@@ -113,7 +115,7 @@ export default function MyListingsPage() {
                   className="object-cover"
                 />
                 <Badge className="absolute top-3 left-3 bg-white/90 text-black border-none shadow-sm">
-                  {listing.status === "active" ? "Live" : "Sold"}
+                  {listing.status === "active" ? "Live" : listing.status}
                 </Badge>
               </div>
               <CardHeader className="p-4 space-y-1">

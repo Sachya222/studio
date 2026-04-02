@@ -20,7 +20,6 @@ import {
   X, 
   Sparkles, 
   Loader2, 
-  AlertCircle,
   Recycle,
   IndianRupee,
   Clock
@@ -30,7 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useUser, useFirestore, useStorage } from "@/firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { collection, doc, query, where, getDocs } from "firebase/firestore";
+import { collection, doc, query, where, getDocs, limit } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function PostItemPage() {
@@ -153,7 +152,8 @@ export default function PostItemPage() {
       const q = query(
         collection(db, "product_listings"),
         where("sellerId", "==", user.uid),
-        where("postedDate", ">=", startOfDayISO)
+        where("postedDate", ">=", startOfDayISO),
+        limit(10) // Limit added to comply with list security rules
       );
 
       const querySnapshot = await getDocs(q);
@@ -189,7 +189,7 @@ export default function PostItemPage() {
         imageUrls: imageUrls,
         sellerId: user.uid,
         postedDate: new Date().toISOString(),
-        status: "pending", // New items start as pending
+        status: "pending",
         userName: user.displayName,
         userEmail: user.email
       };

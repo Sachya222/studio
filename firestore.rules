@@ -27,6 +27,7 @@ service cloud.firestore {
 
     // --- Collection Rules ---
 
+    // Updated rules with explicit list permissions for better clarity and deployment poke.
     match /users/{userId} {
       allow get: if true;
       allow list: if isSignedIn();
