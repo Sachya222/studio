@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,7 @@ import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 export default function PostItemPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const storage = useStorage();
   
@@ -49,6 +49,18 @@ export default function PostItemPage() {
     condition: "",
     college: "SRMU Lucknow"
   });
+
+  // Proactive authentication check
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please login to post an item.",
+        variant: "destructive"
+      });
+      router.push("/");
+    }
+  }, [user, isUserLoading, router, toast]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -185,6 +197,16 @@ export default function PostItemPage() {
       setLoading(false);
     }
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
