@@ -30,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useUser, useFirestore, useStorage } from "@/firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, query, where, getDocs } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function PostItemPage() {
@@ -131,7 +131,7 @@ export default function PostItemPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) return;
+    if (!user || !db) return;
 
     if (images.length === 0) {
       toast({
@@ -145,6 +145,28 @@ export default function PostItemPage() {
     setLoading(true);
 
     try {
+      // Check daily upload limit (max 5 per day)
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const startOfDayISO = startOfDay.toISOString();
+
+      const q = query(
+        collection(db, "product_listings"),
+        where("sellerId", "==", user.uid),
+        where("postedDate", ">=", startOfDayISO)
+      );
+
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.size >= 5) {
+        toast({
+          title: "Daily Limit Reached",
+          description: "To ensure quality, you can only post up to 5 items per day.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
       const imageUrls: string[] = [];
       const listingId = doc(collection(db, "product_listings")).id;
 
@@ -278,6 +300,21 @@ export default function PostItemPage() {
                   </Select>
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Asking Price (₹)</Label>
+                <div className="relative">
+                  <IndianRupee className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    id="price" 
+                    type="number"
+                    className="pl-9" 
+                    placeholder="500"
+                    value={formData.price}
+                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -344,11 +381,19 @@ export default function PostItemPage() {
           <div className="p-6 bg-amber-50 rounded-xl border border-amber-200 space-y-3">
             <div className="flex items-center gap-2 text-amber-700 font-bold">
               <Clock className="h-5 w-5" />
-              <span>Approval Process</span>
+              <span>Limits & Process</span>
             </div>
-            <p className="text-xs text-amber-600 leading-relaxed">
-              To keep SRMU safe, our team reviews every item. Approvals usually take less than 24 hours.
-            </p>
+            <div className="space-y-2">
+              <p className="text-xs text-amber-700 leading-relaxed font-semibold">
+                • Max 5 uploads per day per student.
+              </p>
+              <p className="text-xs text-amber-600 leading-relaxed">
+                • Every item is reviewed for safety.
+              </p>
+              <p className="text-xs text-amber-600 leading-relaxed">
+                • Approvals usually take less than 24h.
+              </p>
+            </div>
           </div>
         </div>
       </form>
