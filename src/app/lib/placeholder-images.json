@@ -70,13 +70,13 @@
     {
       "id": "seller-how-to",
       "description": "Student selling items",
-      "imageUrl": "https://picsum.photos/seed/seller/800/450",
+      "imageUrl": "https://picsum.photos/seed/seller88/800/450",
       "imageHint": "student dorm"
     },
     {
       "id": "buyer-how-to",
       "description": "Student browsing items",
-      "imageUrl": "https://picsum.photos/seed/buyer/800/450",
+      "imageUrl": "https://picsum.photos/seed/buyer88/800/450",
       "imageHint": "student laptop"
     }
   ]

@@ -44,7 +44,11 @@ const steps = [
 ];
 
 export default function HowItWorksPage() {
-  const getImg = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || "";
+  // Safe helper to get images with a fallback to avoid empty src errors
+  const getImg = (id: string) => {
+    const img = PlaceHolderImages.find(img => img.id === id);
+    return img?.imageUrl || `https://picsum.photos/seed/${id}/800/450`;
+  };
 
   return (
     <div className="flex flex-col">
@@ -156,7 +160,7 @@ export default function HowItWorksPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/browsegillu">
+              <Link href="/browse">
                 <Button variant="outline" size="lg" className="gap-2 border-2">Start Browsing <ArrowRight className="h-4 w-4" /></Button>
               </Link>
             </div>
@@ -204,7 +208,7 @@ export default function HowItWorksPage() {
               <Link href="/post">
                 <Button size="lg" className="px-12">Sell Something</Button>
               </Link>
-              <Link href="/browsegillu">
+              <Link href="/browse">
                 <Button variant="outline" size="lg" className="px-12">Explore Items</Button>
               </Link>
             </div>
