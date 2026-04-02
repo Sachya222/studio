@@ -6,9 +6,9 @@ import {
   User, 
   LogIn, 
   LogOut, 
-  Settings, 
   ShoppingBag,
-  UserCircle
+  UserCircle,
+  Loader2
 } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { AuthModal } from "./AuthModal";
@@ -47,6 +47,20 @@ export function FloatingAuthButton() {
       });
     }
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="fixed bottom-8 right-8 z-[60]">
+        <Button 
+          size="icon" 
+          disabled
+          className="w-16 h-16 rounded-full shadow-2xl bg-muted border-4 border-white"
+        >
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed bottom-8 right-8 z-[60]">
@@ -96,7 +110,6 @@ export function FloatingAuthButton() {
         <Button 
           onClick={() => setIsModalOpen(true)}
           size="icon" 
-          disabled={isUserLoading}
           className="w-16 h-16 rounded-full shadow-2xl bg-accent hover:bg-accent/90 border-4 border-white transition-transform hover:scale-110 active:scale-95 group"
         >
           <LogIn className="w-8 h-8 text-white group-hover:rotate-12 transition-transform" />

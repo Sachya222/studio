@@ -44,22 +44,22 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
     
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const firebaseUser = result.user;
 
       // Check if user profile exists in Firestore
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', firebaseUser.uid);
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
         // Create initial profile if it doesn't exist
         // Based on UserProfile entity in backend.json
         await setDoc(userRef, {
-          id: user.uid,
-          fullName: user.displayName || 'Anonymous Student',
-          email: user.email || '',
+          id: firebaseUser.uid,
+          fullName: firebaseUser.displayName || 'Anonymous Student',
+          email: firebaseUser.email || '',
           collegeName: 'SRMU Lucknow', // Default for this campus app
           courseYear: 'Not Specified',
-          profilePhotoUrl: user.photoURL || '',
+          profilePhotoUrl: firebaseUser.photoURL || '',
           isVerified: false,
           averageRating: 0,
           joinedDate: new Date().toISOString(),
@@ -70,12 +70,11 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
 
       toast({
         title: "Welcome to CampusCycle!",
-        description: `Signed in as ${user.displayName}`,
+        description: `Signed in as ${firebaseUser.displayName}`,
       });
       
       if (onOpenChange) onOpenChange(false);
     } catch (error: any) {
-      console.error("Auth Error:", error);
       toast({
         variant: "destructive",
         title: "Authentication Failed",
