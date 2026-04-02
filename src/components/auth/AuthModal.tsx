@@ -16,12 +16,12 @@ import {
 } from "firebase/auth";
 import { 
   doc, 
-  getDoc, 
-  setDoc
+  getDoc
 } from "firebase/firestore";
 import { useAuth, useFirestore, useUser } from "@/firebase";
 import { LogIn, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 interface AuthModalProps {
   children?: React.ReactNode;
@@ -53,11 +53,12 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
       if (!userSnap.exists()) {
         // Create initial profile if it doesn't exist
         // Based on UserProfile entity in backend.json
-        await setDoc(userRef, {
+        // We use non-blocking setDocumentNonBlocking to handle the write
+        setDocumentNonBlocking(userRef, {
           id: firebaseUser.uid,
           fullName: firebaseUser.displayName || 'Anonymous Student',
           email: firebaseUser.email || '',
-          collegeName: 'SRMU Lucknow', // Default for this campus app
+          collegeName: 'SRMU Lucknow', 
           courseYear: 'Not Specified',
           profilePhotoUrl: firebaseUser.photoURL || '',
           isVerified: false,
@@ -65,7 +66,7 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
           joinedDate: new Date().toISOString(),
           wishlistListingIds: [],
           role: 'student'
-        });
+        }, { merge: true });
       }
 
       toast({
@@ -75,6 +76,7 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
       
       if (onOpenChange) onOpenChange(false);
     } catch (error: any) {
+      // Auth specific errors are still toasted for immediate feedback
       toast({
         variant: "destructive",
         title: "Authentication Failed",
