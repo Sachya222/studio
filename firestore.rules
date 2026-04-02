@@ -36,13 +36,16 @@ service cloud.firestore {
     }
 
     match /product_listings/{listingId} {
-      // Allow public browsing of APPROVED items only. 
-      // Admins and owners can see all their own items/pending items.
-      allow list: if (request.query.limit <= 50 && (
-        resource.data.status == 'approved' || 
-        (isSignedIn() && resource.data.sellerId == request.auth.uid) || 
-        isAdmin()
-      ));
+      // Allow public list queries if they filter by status 'approved' and have a reasonable limit.
+      allow list: if (request.query.limit <= 50 && resource.data.status == 'approved');
+      
+      // Allow list queries for owners to see their own items (any status).
+      allow list: if (isSignedIn() && request.query.limit <= 50 && resource.data.sellerId == request.auth.uid);
+      
+      // Admins can list everything without the status filter.
+      allow list: if isAdmin();
+
+      // Individual item access
       allow get: if resource.data.status == 'approved' || isExistingOwner(resource.data.sellerId) || isAdmin();
       
       allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid && request.resource.data.status == 'pending';

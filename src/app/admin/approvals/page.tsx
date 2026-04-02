@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, useFirestore, useCollection, useDoc, useMemoFirebase } from "@/firebase";
-import { collection, query, where, orderBy, doc } from "firebase/firestore";
+import { collection, query, where, orderBy, doc, limit } from "firebase/firestore";
 import { 
   Card, 
   CardContent, 
@@ -18,9 +18,8 @@ import {
   Loader2, 
   CheckCircle, 
   XCircle, 
-  ExternalLink,
-  ShieldAlert,
-  Inbox
+  Inbox,
+  ShieldAlert
 } from "lucide-react";
 import Image from "next/image";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -32,7 +31,7 @@ export default function AdminApprovalsPage() {
   const db = useFirestore();
   const { toast } = useToast();
 
-  // Check if current user is admin
+  // Fetch admin role doc only if logged in
   const adminDocRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, "roles_admin", user.uid);
@@ -53,14 +52,16 @@ export default function AdminApprovalsPage() {
     }
   }, [user, isUserLoading, adminData, isAdminLoading, router, toast]);
 
+  // Only create the query if the user is confirmed as admin
   const pendingListingsQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !adminData) return null;
     return query(
       collection(db, "product_listings"),
       where("status", "==", "pending"),
-      orderBy("postedDate", "desc")
+      orderBy("postedDate", "desc"),
+      limit(50)
     );
-  }, [db]);
+  }, [db, adminData]);
 
   const { data: pendingListings, isLoading: isListingsLoading } = useCollection(pendingListingsQuery);
 
@@ -71,11 +72,11 @@ export default function AdminApprovalsPage() {
     
     toast({
       title: newStatus === "approved" ? "Item Approved" : "Item Rejected",
-      description: `The item status has been updated to ${newStatus}.`,
+      description: `The item status has been updated.`,
     });
   };
 
-  if (isUserLoading || isAdminLoading || isListingsLoading) {
+  if (isUserLoading || isAdminLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -97,7 +98,11 @@ export default function AdminApprovalsPage() {
         </div>
       </div>
 
-      {!pendingListings || pendingListings.length === 0 ? (
+      {isListingsLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : !pendingListings || pendingListings.length === 0 ? (
         <Card className="border-2 border-dashed py-20 text-center flex flex-col items-center justify-center space-y-4">
           <Inbox className="h-12 w-12 text-muted-foreground opacity-30" />
           <h3 className="text-xl font-bold font-headline">All Caught Up!</h3>
@@ -127,7 +132,7 @@ export default function AdminApprovalsPage() {
               <CardContent className="px-4 pb-4 pt-0 flex-grow">
                 <p className="text-xs text-muted-foreground line-clamp-3 mb-4">{listing.description}</p>
                 <div className="text-[10px] font-medium p-2 bg-secondary/50 rounded-lg">
-                  Submitted by: {listing.userName || "Unknown"} ({listing.userEmail})
+                  Submitted by: {listing.userName || "Unknown"}
                 </div>
               </CardContent>
               <CardFooter className="p-4 pt-0 border-t flex gap-2">

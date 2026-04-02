@@ -23,7 +23,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, where } from "firebase/firestore";
+import { collection, query, orderBy, where, limit } from "firebase/firestore";
 
 export default function BrowsePage() {
   const searchParams = useSearchParams();
@@ -42,10 +42,12 @@ export default function BrowsePage() {
 
   const listingsQuery = useMemoFirebase(() => {
     if (!db) return null;
+    // We filter by status approved and add a limit to match security rules
     return query(
       collection(db, "product_listings"),
-      where("status", "==", "approved"), // Only show approved items
-      orderBy("postedDate", "desc")
+      where("status", "==", "approved"),
+      orderBy("postedDate", "desc"),
+      limit(50)
     );
   }, [db]);
 
@@ -168,7 +170,7 @@ export default function BrowsePage() {
             <PackageSearch className="h-8 w-8 text-muted-foreground" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-bold font-headline">No approved items found</h3>
+            <h3 className="text-xl font-bold font-headline">No items found</h3>
             <p className="text-muted-foreground max-w-xs mx-auto">
               We couldn't find any approved items matching your search. Try a different category.
             </p>
