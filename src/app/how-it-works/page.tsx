@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const steps = [
   {
@@ -44,12 +42,6 @@ const steps = [
 ];
 
 export default function HowItWorksPage() {
-  // Safe helper to get images with a fallback to avoid empty src errors
-  const getImg = (id: string) => {
-    const img = PlaceHolderImages.find(img => img.id === id);
-    return img?.imageUrl || `https://picsum.photos/seed/${id}/800/450`;
-  };
-
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -89,81 +81,60 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Seller vs Buyer deep dive */}
+      {/* Seller Deep Dive */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm">
-                <PlusCircle className="h-4 w-4" />
-                <span>For Sellers</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">Recycle your items in minutes</h2>
-              <ul className="space-y-4">
-                {[
-                  "Take 3 quick photos of your item",
-                  "Let our AI suggest the best price and category",
-                  "Reach hundreds of students in your building instantly",
-                  "Keep 100% of your profit - no hidden fees"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-muted-foreground">
-                    <ChevronRight className="h-5 w-5 text-primary shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/post">
-                <Button size="lg" className="gap-2">Post an Item <ArrowRight className="h-4 w-4" /></Button>
-              </Link>
+          <div className="max-w-3xl mx-auto text-center space-y-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm">
+              <PlusCircle className="h-4 w-4" />
+              <span>For Sellers</span>
             </div>
-            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border-8 border-secondary">
-              <Image 
-                src={getImg("seller-how-to")} 
-                alt="Student selling items" 
-                fill 
-                className="object-cover"
-                data-ai-hint="student dorm"
-              />
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">Recycle your items in minutes</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+              {[
+                "Take 3 quick photos of your item",
+                "Let our AI suggest the best price and category",
+                "Reach hundreds of students in your building instantly",
+                "Keep 100% of your profit - no hidden fees"
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 p-4 bg-secondary/10 rounded-xl border border-border/50">
+                  <ChevronRight className="h-5 w-5 text-primary shrink-0" />
+                  <span className="text-muted-foreground">{item}</span>
+                </div>
+              ))}
             </div>
+            <Link href="/post" className="inline-block">
+              <Button size="lg" className="gap-2">Post an Item <ArrowRight className="h-4 w-4" /></Button>
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Buyer Deep Dive */}
       <section className="py-24 bg-secondary/10">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="order-2 lg:order-1 relative aspect-video rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
-              <Image 
-                src={getImg("buyer-how-to")} 
-                alt="Student browsing items" 
-                fill 
-                className="object-cover"
-                data-ai-hint="student laptop"
-              />
+          <div className="max-w-3xl mx-auto text-center space-y-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-medium text-sm">
+              <Search className="h-4 w-4" />
+              <span>For Buyers</span>
             </div>
-            <div className="order-1 lg:order-2 space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent font-medium text-sm">
-                <Search className="h-4 w-4" />
-                <span>For Buyers</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">Find essentials at student prices</h2>
-              <ul className="space-y-4">
-                {[
-                  "Browse by category or search for specific textbooks",
-                  "Filter by your specific campus or college hall",
-                  "Compare prices from multiple student sellers",
-                  "Save items to your wishlist for later"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-muted-foreground">
-                    <ChevronRight className="h-5 w-5 text-accent shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/browse">
-                <Button variant="outline" size="lg" className="gap-2 border-2">Start Browsing <ArrowRight className="h-4 w-4" /></Button>
-              </Link>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">Find essentials at student prices</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+              {[
+                "Browse by category or search for specific textbooks",
+                "Filter by your specific campus or college hall",
+                "Compare prices from multiple student sellers",
+                "Save items to your wishlist for later"
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 p-4 bg-white rounded-xl border border-border/50 shadow-sm">
+                  <ChevronRight className="h-5 w-5 text-accent shrink-0" />
+                  <span className="text-muted-foreground">{item}</span>
+                </div>
+              ))}
             </div>
+            <Link href="/browsegillu" className="inline-block">
+              <Button variant="outline" size="lg" className="gap-2 border-2">Start Browsing <ArrowRight className="h-4 w-4" /></Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -208,7 +179,7 @@ export default function HowItWorksPage() {
               <Link href="/post">
                 <Button size="lg" className="px-12">Sell Something</Button>
               </Link>
-              <Link href="/browse">
+              <Link href="/browsegillu">
                 <Button variant="outline" size="lg" className="px-12">Explore Items</Button>
               </Link>
             </div>
