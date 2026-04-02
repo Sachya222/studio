@@ -219,7 +219,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4 w-full max-w-md">
               {[
-                { label: "Items Reused", val: "5.4k+", icon: <Recycle className="h-5 w-5" /> },
+                { label: "Items Reused", val: "1.2K+", icon: <Recycle className="h-5 w-5" /> },
                 { label: "CO2 Saved (kg)", val: "12k+", icon: <Globe className="h-5 w-5" /> },
                 { label: "Money Saved", val: "10K+", icon: <IndianRupee className="h-5 w-5" /> },
                 { label: "Active Users", val: "100+", icon: <Users className="h-5 w-5" /> }
