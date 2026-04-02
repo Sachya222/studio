@@ -222,7 +222,7 @@ export default function Home() {
                 { label: "Items Reused", val: "5.4k+", icon: <Recycle className="h-5 w-5" /> },
                 { label: "CO2 Saved (kg)", val: "12k+", icon: <Globe className="h-5 w-5" /> },
                 { label: "Money Saved", val: "10K+", icon: <IndianRupee className="h-5 w-5" /> },
-                { label: "Active Users", val: "800+", icon: <Users className="h-5 w-5" /> }
+                { label: "Active Users", val: "100+", icon: <Users className="h-5 w-5" /> }
               ].map((stat, i) => (
                 <div key={i} className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 text-center space-y-2">
                   <div className="text-3xl font-bold font-headline">{stat.val}</div>
