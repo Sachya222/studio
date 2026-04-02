@@ -25,6 +25,11 @@ import Link from "next/link";
 import { signOut } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 
+/**
+ * A floating action button that handles user authentication.
+ * It displays a login button when unauthenticated and a user menu when logged in.
+ * Includes built-in hydration safety to prevent Next.js hydration mismatches.
+ */
 export function FloatingAuthButton() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
@@ -32,7 +37,9 @@ export function FloatingAuthButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch by waiting until mounted
+  // Use useEffect to determine when the component has mounted on the client.
+  // This is the standard pattern for avoiding hydration errors in Next.js
+  // when rendering content that depends on client-only state (like Firebase Auth).
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -54,12 +61,9 @@ export function FloatingAuthButton() {
     }
   };
 
-  // Return null or a non-dynamic placeholder during SSR
-  if (!mounted) {
-    return null;
-  }
-
-  if (isUserLoading) {
+  // To prevent hydration mismatches, the server-rendered HTML and the first 
+  // client-side render must match exactly. We force a 'loading' state for both.
+  if (!mounted || isUserLoading) {
     return (
       <div className="fixed bottom-8 right-8 z-[60]">
         <Button 
@@ -73,6 +77,7 @@ export function FloatingAuthButton() {
     );
   }
 
+  // Once hydrated and auth state is determined, render the interactive UI.
   return (
     <div className="fixed bottom-8 right-8 z-[60]">
       {user ? (
