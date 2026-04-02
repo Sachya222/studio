@@ -76,7 +76,7 @@ export default function AboutPage() {
                 Niraj needed a mini-fridge, and Aman was throwing one away. They were in the same building, but had no way of knowing. That's when the idea for CampusCycle was born.
               </p>
               <p>
-                Today, CampusCycle serves over 40 universities, helping students save money while fostering a culture of reuse that protects our planet.
+                Today, CampusCycle serves over  universities, helping students save money while fostering a culture of reuse that protects our planet.
               </p>
             </div>
           </div>
