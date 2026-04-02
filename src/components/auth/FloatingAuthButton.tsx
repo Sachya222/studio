@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
   User, 
@@ -30,6 +30,12 @@ export function FloatingAuthButton() {
   const auth = useAuth();
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch by waiting until mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     if (!auth) return;
@@ -47,6 +53,11 @@ export function FloatingAuthButton() {
       });
     }
   };
+
+  // Return null or a non-dynamic placeholder during SSR
+  if (!mounted) {
+    return null;
+  }
 
   if (isUserLoading) {
     return (
