@@ -1,83 +1,62 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * CAMPUSCYCLE SECURITY RULES
-     * 
-     * Core Philosophy:
-     * This ruleset implements a multi-tiered security model designed for a campus marketplace. 
-     * It prioritizes 'Authorization Independence' by ensuring documents contain the necessary 
-     * metadata (like owner IDs or participant lists) to make access decisions without 
-     * expensive cross-document lookups.
-     *
-     * Updated: July 2024 - Explicitly separating get and list for product_listings to resolve hydration/permission lag.
-     */
-
     // --- Helper Functions ---
 
-    /** Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** Checks if the authenticated user matches the provided userId. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** Verifies ownership for existing documents during update or delete. */
     function isExistingOwner(userId) {
       return resource != null && isOwner(userId);
     }
 
-    /** Checks if the authenticated user is listed in a participants array. */
     function isParticipant(participantIds) {
       return isSignedIn() && (request.auth.uid in participantIds);
     }
 
-    /** Checks if the authenticated user has an entry in the admin roles collection. */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
     // --- Collection Rules ---
 
-    /**
-     * @description Rules for user profiles. Owners can manage their data; profiles are publicly readable for marketplace trust.
-     */
     match /users/{userId} {
       allow get: if true;
       allow list: if isSignedIn();
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
       allow delete: if isAdmin();
     }
 
-    /**
-     * @description Rules for product listings. 
-     * Explicitly allows get and list for the marketplace.
-     */
     match /product_listings/{listingId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid;
-      allow update: if isExistingOwner(resource.data.sellerId) && request.resource.data.sellerId == resource.data.sellerId;
+      // Allow public browsing of APPROVED items only. 
+      // Admins and owners can see all their own items/pending items.
+      allow list: if (request.query.limit <= 50 && (
+        resource.data.status == 'approved' || 
+        (isSignedIn() && resource.data.sellerId == request.auth.uid) || 
+        isAdmin()
+      ));
+      allow get: if resource.data.status == 'approved' || isExistingOwner(resource.data.sellerId) || isAdmin();
+      
+      allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid && request.resource.data.status == 'pending';
+      allow update: if (isExistingOwner(resource.data.sellerId) && request.resource.data.status == resource.data.status) || isAdmin();
       allow delete: if isExistingOwner(resource.data.sellerId) || isAdmin();
     }
 
-    /**
-     * @description Rules for private chat threads. Access is restricted to the buyer and seller involved.
-     */
     match /chat_threads/{chatThreadId} {
       allow get, list: if isParticipant(resource.data.participantIds);
       allow create: if isSignedIn() && isParticipant(request.resource.data.participantIds);
-      allow update: if isParticipant(resource.data.participantIds) && request.resource.data.participantIds == resource.data.participantIds;
+      allow update: if isParticipant(resource.data.participantIds);
       allow delete: if isAdmin();
     }
 
-    /**
-     * @description Rules for messages within a chat. Uses denormalized participant data for independent authorization.
-     */
     match /chat_threads/{chatThreadId}/messages/{messageId} {
       allow get, list: if isParticipant(resource.data.participantIds);
       allow create: if isParticipant(request.resource.data.participantIds) && request.resource.data.senderId == request.auth.uid;
@@ -85,9 +64,6 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    /**
-     * @description Rules for reviews. Publicly readable to build community trust; only the reviewer can create.
-     */
     match /reviews/{reviewId} {
       allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.reviewerId == request.auth.uid;
@@ -95,9 +71,6 @@ service cloud.firestore {
       allow delete: if isExistingOwner(resource.data.reviewerId) || isAdmin();
     }
 
-    /**
-     * @description Rules for administrative roles. Managed via existence checks.
-     */
     match /roles_admin/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();

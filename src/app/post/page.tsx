@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -21,7 +22,8 @@ import {
   Loader2, 
   AlertCircle,
   Recycle,
-  IndianRupee
+  IndianRupee,
+  Clock
 } from "lucide-react";
 import { aiListingAssistantSuggestion } from "@/ai/flows/ai-listing-assistant-suggestion-flow";
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +52,6 @@ export default function PostItemPage() {
     college: "SRMU Lucknow"
   });
 
-  // Proactive authentication check
   useEffect(() => {
     if (!isUserLoading && !user) {
       toast({
@@ -130,14 +131,7 @@ export default function PostItemPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to post a listing.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!user) return;
 
     if (images.length === 0) {
       toast({
@@ -173,7 +167,7 @@ export default function PostItemPage() {
         imageUrls: imageUrls,
         sellerId: user.uid,
         postedDate: new Date().toISOString(),
-        status: "active",
+        status: "pending", // New items start as pending
         userName: user.displayName,
         userEmail: user.email
       };
@@ -181,11 +175,11 @@ export default function PostItemPage() {
       setDocumentNonBlocking(listingRef, listingData, { merge: true });
 
       toast({
-        title: "Success!",
-        description: "Your item is now live on CampusCycle.",
+        title: "Submission Successful!",
+        description: "Your item has been submitted and is pending approval by an admin.",
       });
       
-      router.push("/browsegillu");
+      router.push("/my-listings");
     } catch (error) {
       console.error("Error posting listing:", error);
       toast({
@@ -212,7 +206,7 @@ export default function PostItemPage() {
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="space-y-4 mb-8">
         <h1 className="text-3xl font-headline font-bold">List an Item</h1>
-        <p className="text-muted-foreground">Turn your unused items into cash and help other students at SRMU.</p>
+        <p className="text-muted-foreground">Turn your unused items into cash. Note: All listings require admin approval.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -237,7 +231,7 @@ export default function PostItemPage() {
                 <Label htmlFor="description">Detailed Description</Label>
                 <Textarea 
                   id="description" 
-                  placeholder="Describe the condition, any defects, or specific features..." 
+                  placeholder="Describe the condition..." 
                   className="min-h-[150px]"
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -320,7 +314,7 @@ export default function PostItemPage() {
           <div className="flex justify-end gap-4">
             <Button size="lg" disabled={loading} className="gap-2 px-8">
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Publish Listing
+              Submit for Approval
             </Button>
           </div>
         </div>
@@ -332,16 +326,12 @@ export default function PostItemPage() {
                 <Sparkles className="h-5 w-5" />
                 <span>AI Listing Assistant</span>
               </div>
-              <CardDescription>Get the perfect price and category automatically.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Our AI analyzes your photos and description to suggest values in ₹ (INR) that help your item sell faster.
-              </p>
               <Button 
                 type="button" 
                 variant="outline" 
-                className="w-full gap-2 border-primary/20 hover:bg-primary/10 hover:text-primary transition-all"
+                className="w-full gap-2 border-primary/20 hover:bg-primary/10"
                 onClick={getAiSuggestion}
                 disabled={aiSuggesting}
               >
@@ -351,48 +341,13 @@ export default function PostItemPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Pricing & Location</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Asking Price (₹)</Label>
-                <div className="relative">
-                  <IndianRupee className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="price" 
-                    placeholder="0.00" 
-                    className="pl-9" 
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="college">Pickup Campus</Label>
-                <Input 
-                  id="college" 
-                  placeholder="e.g. SRMU Lucknow" 
-                  value={formData.college}
-                  onChange={(e) => setFormData({...formData, college: e.target.value})}
-                  required
-                />
-                <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" /> Buyers will see this location.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="p-6 bg-accent/10 rounded-xl border border-accent/20 space-y-3">
-            <div className="flex items-center gap-2 text-accent font-bold">
-              <Recycle className="h-5 w-5" />
-              <span>Sustainability Tip</span>
+          <div className="p-6 bg-amber-50 rounded-xl border border-amber-200 space-y-3">
+            <div className="flex items-center gap-2 text-amber-700 font-bold">
+              <Clock className="h-5 w-5" />
+              <span>Approval Process</span>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Selling locally at SRMU prevents unnecessary transport emissions and helps our campus ecosystem!
+            <p className="text-xs text-amber-600 leading-relaxed">
+              To keep SRMU safe, our team reviews every item. Approvals usually take less than 24 hours.
             </p>
           </div>
         </div>

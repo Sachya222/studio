@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -34,25 +35,22 @@ export default function BrowsePage() {
 
   const categories = ["All", "Books", "Electronics", "Furniture", "Cycles", "Lab Equipment", "Hostel Essentials", "Daily Use Items", "Others"];
 
-  // Handle category from URL changes
   useEffect(() => {
     const cat = searchParams.get("category");
     if (cat) setActiveCategory(cat);
   }, [searchParams]);
 
-  // Memoize the Firestore query
   const listingsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(
       collection(db, "product_listings"),
-      where("status", "==", "active"),
+      where("status", "==", "approved"), // Only show approved items
       orderBy("postedDate", "desc")
     );
   }, [db]);
 
   const { data: listings, isLoading } = useCollection(listingsQuery);
 
-  // Filter listings based on search and category
   const filteredListings = listings?.filter(listing => {
     const matchesSearch = listing.title.toLowerCase().includes(search.toLowerCase()) || 
                          listing.description?.toLowerCase().includes(search.toLowerCase());
@@ -170,9 +168,9 @@ export default function BrowsePage() {
             <PackageSearch className="h-8 w-8 text-muted-foreground" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-bold font-headline">No items found</h3>
+            <h3 className="text-xl font-bold font-headline">No approved items found</h3>
             <p className="text-muted-foreground max-w-xs mx-auto">
-              We couldn't find anything matching your search in {activeCategory}. Try a different category or keywords.
+              We couldn't find any approved items matching your search. Try a different category.
             </p>
           </div>
           <Button variant="outline" className="rounded-full px-8" onClick={() => { setSearch(""); setActiveCategory("All"); }}>
@@ -180,14 +178,6 @@ export default function BrowsePage() {
           </Button>
         </div>
       )}
-
-      <div className="mt-20 text-center space-y-4 bg-primary/5 p-12 rounded-3xl border border-primary/10">
-        <h3 className="text-2xl font-headline font-bold">Can't find what you're looking for?</h3>
-        <p className="text-muted-foreground">Our campus community is growing every day.</p>
-        <Button variant="default" size="lg" className="rounded-full px-12 mt-4">
-          Request an Item
-        </Button>
-      </div>
     </div>
   );
 }
