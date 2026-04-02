@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -65,7 +64,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg">Headquarters</h3>
-                <p className="text-muted-foreground">Innovation Hub, Campus Way, Boston, MA 02118</p>
+                <p className="text-muted-foreground">Innovation Hub, Campus Way, Lucknow, UP 226028</p>
               </div>
             </div>
           </div>
