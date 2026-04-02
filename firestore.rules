@@ -27,7 +27,8 @@ service cloud.firestore {
 
     // --- Collection Rules ---
 
-    // Updated rules with explicit list permissions for better clarity and deployment poke.
+    // Security Rules Deployment Poke: 2024-05-20 15:45:00
+    // Standardizing user profile access
     match /users/{userId} {
       allow get: if true;
       allow list: if isSignedIn();
@@ -37,20 +38,23 @@ service cloud.firestore {
     }
 
     match /product_listings/{listingId} {
-      // Allow public list queries if they filter by status 'approved' and have a reasonable limit.
-      allow list: if (request.query.limit <= 50 && resource.data.status == 'approved');
-      
-      // Allow list queries for owners to see their own items (any status).
-      allow list: if (isSignedIn() && request.query.limit <= 50 && resource.data.sellerId == request.auth.uid);
-      
-      // Admins can list everything without the status filter.
-      allow list: if isAdmin();
+      // Unified list rule for marketplace browsing, ownership checks, and admin review.
+      // Every document in the result set must satisfy one of these conditions.
+      allow list: if request.query.limit <= 50 && (
+        resource.data.status == 'approved' || 
+        (isSignedIn() && resource.data.sellerId == request.auth.uid) ||
+        isAdmin()
+      );
 
-      // Individual item access
+      // Individual document access
       allow get: if resource.data.status == 'approved' || isExistingOwner(resource.data.sellerId) || isAdmin();
       
+      // Creations start as 'pending' for admin review
       allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid && request.resource.data.status == 'pending';
+      
+      // Updates are restricted to owners (status locked) or admins
       allow update: if (isExistingOwner(resource.data.sellerId) && request.resource.data.status == resource.data.status) || isAdmin();
+      
       allow delete: if isExistingOwner(resource.data.sellerId) || isAdmin();
     }
 
