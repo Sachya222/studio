@@ -70,7 +70,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-headline font-bold">The CampusCycle Story</h2>
             <div className="space-y-6 text-lg text-muted-foreground text-left">
               <p>
-                It all started in a dorm room in 2023. Our founders, Alex and Jamie, were shocked by the amount of perfectly good furniture and textbooks thrown into campus dumpsters at the end of every semester.
+                It all started in a my friend room in 2023. , Me and friend, were shocked by the amount of perfectly good furniture and textbooks thrown into campus dumpsters at the end of every semester.
               </p>
               <p>
                 Alex needed a mini-fridge, and Jamie was throwing one away. They were in the same building, but had no way of knowing. That's when the idea for CampusCycle was born.
