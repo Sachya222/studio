@@ -11,7 +11,7 @@ service cloud.firestore {
      * metadata (like owner IDs or participant lists) to make access decisions without 
      * expensive cross-document lookups.
      *
-     * Updated: Ensuring product_listings are publicly readable for marketplace browsing.
+     * Updated: July 2024 - Explicitly separating get and list for product_listings to resolve hydration/permission lag.
      */
 
     // --- Helper Functions ---
@@ -55,11 +55,11 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for product listings. Anyone can browse active items; only the seller can manage the listing.
-     * Enforces public read access to support browsing and search.
+     * @description Rules for product listings. 
+     * Explicitly allows get and list for the marketplace.
      */
     match /product_listings/{listingId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid;
       allow update: if isExistingOwner(resource.data.sellerId) && request.resource.data.sellerId == resource.data.sellerId;
       allow delete: if isExistingOwner(resource.data.sellerId) || isAdmin();
