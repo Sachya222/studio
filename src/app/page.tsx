@@ -238,7 +238,7 @@ export default function Home() {
       <section className="py-24 text-center">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto bg-secondary/50 rounded-3xl p-12 md:p-20 border-2 border-dashed border-primary/20 space-y-8">
-            <h2 className="text-3xl md:text-5xl font-headline font-bold">Ready to Declutter Your Dorm?</h2>
+            <h2 className="text-3xl md:text-5xl font-headline font-bold">Ready to Recycle Your Item ?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Join hundreds of SRMU students saving money and the planet. Listing takes less than 2 minutes.
             </p>
