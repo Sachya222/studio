@@ -12,16 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { 
   GoogleAuthProvider, 
-  signInWithPopup 
+  signInWithRedirect 
 } from "firebase/auth";
-import { 
-  doc, 
-  getDoc
-} from "firebase/firestore";
-import { useAuth, useFirestore, useUser } from "@/firebase";
+import { useAuth } from "@/firebase";
 import { LogIn, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 interface AuthModalProps {
   children?: React.ReactNode;
@@ -31,58 +26,26 @@ interface AuthModalProps {
 
 export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
   const auth = useAuth();
-  const db = useFirestore();
-  const { user } = useUser();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
-    if (!auth || !db) return;
+    if (!auth) return;
     
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     
     try {
-      const result = await signInWithPopup(auth, provider);
-      const firebaseUser = result.user;
-
-      // Check if user profile exists in Firestore
-      const userRef = doc(db, 'users', firebaseUser.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        // Create initial profile if it doesn't exist
-        // Based on UserProfile entity in backend.json
-        // We use non-blocking setDocumentNonBlocking to handle the write
-        setDocumentNonBlocking(userRef, {
-          id: firebaseUser.uid,
-          fullName: firebaseUser.displayName || 'Anonymous Student',
-          email: firebaseUser.email || '',
-          collegeName: 'SRMU Lucknow', 
-          courseYear: 'Not Specified',
-          profilePhotoUrl: firebaseUser.photoURL || '',
-          isVerified: false,
-          averageRating: 0,
-          joinedDate: new Date().toISOString(),
-          wishlistListingIds: [],
-          role: 'student'
-        }, { merge: true });
-      }
-
-      toast({
-        title: "Welcome to CampusCycle!",
-        description: `Signed in as ${firebaseUser.displayName}`,
-      });
-      
-      if (onOpenChange) onOpenChange(false);
+      // Switched to signInWithRedirect as requested
+      await signInWithRedirect(auth, provider);
+      // Logic for user profile creation is now handled centrally in FirebaseProvider
+      // to accommodate the page reload that happens with redirects.
     } catch (error: any) {
-      // Auth specific errors are still toasted for immediate feedback
       toast({
         variant: "destructive",
         title: "Authentication Failed",
         description: error.message || "Failed to sign in with Google.",
       });
-    } finally {
       setIsLoading(false);
     }
   };

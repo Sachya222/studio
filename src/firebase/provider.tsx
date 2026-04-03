@@ -2,10 +2,11 @@
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
+import { Firestore, doc, getDoc } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -64,8 +65,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   });
 
   useEffect(() => {
-    if (!auth) {
-      setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
+    if (!auth || !firestore) {
+      setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Firebase services not provided.") });
       return;
     }
 
@@ -73,7 +74,32 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
     const unsubscribe = onAuthStateChanged(
       auth,
-      (firebaseUser) => {
+      async (firebaseUser) => {
+        if (firebaseUser) {
+          // Centrally handle user profile existence check and creation
+          // This is essential for signInWithRedirect to work correctly.
+          const userRef = doc(firestore, 'users', firebaseUser.uid);
+          try {
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+              setDocumentNonBlocking(userRef, {
+                id: firebaseUser.uid,
+                fullName: firebaseUser.displayName || 'Anonymous Student',
+                email: firebaseUser.email || '',
+                collegeName: 'SRMU Lucknow', 
+                courseYear: 'Not Specified',
+                profilePhotoUrl: firebaseUser.photoURL || '',
+                isVerified: false,
+                averageRating: 0,
+                joinedDate: new Date().toISOString(),
+                wishlistListingIds: [],
+                role: 'student'
+              }, { merge: true });
+            }
+          } catch (e) {
+            console.error("Error checking/creating user profile:", e);
+          }
+        }
         setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
       },
       (error) => {
@@ -82,7 +108,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       }
     );
     return () => unsubscribe();
-  }, [auth]);
+  }, [auth, firestore]);
 
   const contextValue = useMemo((): FirebaseContextState => {
     const servicesAvailable = !!(firebaseApp && firestore && auth && storage);
