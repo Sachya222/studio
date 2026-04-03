@@ -13,13 +13,10 @@ import Image from "next/image";
 
 /**
  * BrowsePage displays a real-time list of approved products from the marketplace.
- * It uses the 'product_listings' collection and sorts by 'createdAt' descending.
  */
 export default function BrowsePage() {
   const db = useFirestore();
 
-  // Requirements: Fetch approved products, real-time listener, sort by createdAt descending.
-  // Added limit(50) to ensure consistent performance and compliance with security best practices.
   const listingsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(
@@ -61,7 +58,6 @@ export default function BrowsePage() {
                   alt={item.title} 
                   fill 
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
               </div>

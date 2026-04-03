@@ -2,18 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Deployment poke to ensure immediate update and propagation of new rules.
-    // Updated at: 2024-05-24T16:00:00Z
+    // Updated at: 2024-05-24T18:30:00Z
 
     // product listings
-    match /product_listings/{id} {
-      // Allow public listing and getting for everyone
-      // This is necessary for the marketplace browse functionality
-      allow list: if true;
-      allow get: if true;
+    match /product_listings/{listingId} {
+      // Allow public read access for everyone to browse items
+      allow read: if true;
       
-      // Allow creation and updates for authenticated users
-      // Note: Admin logic and owner logic can be further refined here
-      allow write: if request.auth != null;
+      // Allow creation for any authenticated student
+      allow create: if request.auth != null;
+      
+      // Allow updates/deletes only for the owner or an admin
+      allow update, delete: if request.auth != null && (
+        request.auth.uid == resource.data.userId || 
+        exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))
+      );
     }
 
     // users profiles

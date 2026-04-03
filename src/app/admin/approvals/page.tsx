@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -31,7 +30,6 @@ export default function AdminApprovalsPage() {
   const db = useFirestore();
   const { toast } = useToast();
 
-  // Fetch admin role doc only if logged in
   const adminDocRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, "roles_admin", user.uid);
@@ -52,7 +50,6 @@ export default function AdminApprovalsPage() {
     }
   }, [user, isUserLoading, adminData, isAdminLoading, router, toast]);
 
-  // Only create the query if the user is confirmed as admin
   const pendingListingsQuery = useMemoFirebase(() => {
     if (!db || !adminData) return null;
     return query(
@@ -132,7 +129,7 @@ export default function AdminApprovalsPage() {
               <CardContent className="px-4 pb-4 pt-0 flex-grow">
                 <p className="text-xs text-muted-foreground line-clamp-3 mb-4">{listing.description}</p>
                 <div className="text-[10px] font-medium p-2 bg-secondary/50 rounded-lg">
-                  Submitted by: {listing.userName || "Unknown"}
+                  User ID: {listing.userId}
                 </div>
               </CardContent>
               <CardFooter className="p-4 pt-0 border-t flex gap-2">

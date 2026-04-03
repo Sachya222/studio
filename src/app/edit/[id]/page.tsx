@@ -59,7 +59,7 @@ export default function EditListingPage() {
 
   useEffect(() => {
     if (listing) {
-      if (listing.sellerId !== user?.uid) {
+      if (listing.userId !== user?.uid) {
         toast({
           title: "Access Denied",
           description: "You can only edit your own listings.",
@@ -70,13 +70,13 @@ export default function EditListingPage() {
       }
       setFormData({
         title: listing.title,
-        description: listing.description,
+        description: listing.description || "",
         category: listing.category,
         price: listing.price.toString(),
-        condition: listing.condition,
-        college: listing.collegeLocation
+        condition: listing.condition || "Good",
+        college: listing.collegeLocation || "SRMU Lucknow"
       });
-      setImages(listing.imageUrls || []);
+      setImages(listing.image ? [listing.image] : []);
     }
   }, [listing, user, router, toast]);
 
@@ -84,7 +84,7 @@ export default function EditListingPage() {
     if (!formData.title || !formData.description || images.length === 0) {
       toast({
         title: "Missing Info",
-        description: "Title, description and at least one photo required for AI suggestion.",
+        description: "Title, description and photo required for AI suggestion.",
         variant: "destructive"
       });
       return;
@@ -95,7 +95,7 @@ export default function EditListingPage() {
       const result = await aiListingAssistantSuggestion({
         title: formData.title,
         description: formData.description,
-        photoDataUris: images.filter(img => img.startsWith('data:')) // AI only takes data uris
+        photoDataUris: images.filter(img => img.startsWith('data:'))
       });
 
       setFormData(prev => ({
@@ -130,8 +130,6 @@ export default function EditListingPage() {
         description: formData.description,
         category: formData.category,
         price: parseFloat(formData.price),
-        condition: formData.condition,
-        collegeLocation: formData.college,
         updatedDate: new Date().toISOString()
       };
 
@@ -219,38 +217,18 @@ export default function EditListingPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Condition</Label>
-                  <Select 
-                    value={formData.condition} 
-                    onValueChange={(val) => setFormData({...formData, condition: val})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Condition" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['New', 'Like New', 'Good', 'Fair'].map(cond => (
-                        <SelectItem key={cond} value={cond}>{cond}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Photos</CardTitle>
-              <CardDescription>Note: Photo editing is restricted in this version.</CardDescription>
+              <CardTitle>Photo</CardTitle>
+              <CardDescription>Note: Photo replacement is restricted in this version.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4">
-                {images.map((img, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border-2">
-                    <Image src={img} alt="Preview" fill className="object-cover" />
-                  </div>
-                ))}
+              <div className="relative aspect-video rounded-lg overflow-hidden border-2">
+                <Image src={listing.image || "https://picsum.photos/seed/placeholder/400/300"} alt="Preview" fill className="object-cover" />
               </div>
             </CardContent>
           </Card>
@@ -290,7 +268,7 @@ export default function EditListingPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Pricing & Location</CardTitle>
+              <CardTitle>Pricing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -305,15 +283,6 @@ export default function EditListingPage() {
                     required
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="college">Pickup Campus</Label>
-                <Input 
-                  id="college" 
-                  value={formData.college}
-                  onChange={(e) => setFormData({...formData, college: e.target.value})}
-                  required
-                />
               </div>
             </CardContent>
           </Card>
