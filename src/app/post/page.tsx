@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -153,7 +152,6 @@ export default function PostItemPage() {
     setLoading(true);
 
     try {
-      // 0. Check daily limit
       const canUpload = await checkDailyLimit(user.uid);
       if (!canUpload) {
         toast({
@@ -165,15 +163,12 @@ export default function PostItemPage() {
         return;
       }
 
-      // 1. Upload image to storage
       const tempId = Math.random().toString(36).substring(7);
       const imageRef = ref(storage, `listings/${user.uid}/${tempId}`);
       await uploadString(imageRef, imagePreview, 'data_url');
-      
-      // 2. Get download URL
       const imageUrl = await getDownloadURL(imageRef);
 
-      // 3. Save in firestore using required schema
+      // Exact structure as requested: title, price, image, category, userId, createdAt
       const listingData = {
         title: formData.title,
         price: parseFloat(formData.price),
@@ -182,7 +177,7 @@ export default function PostItemPage() {
         userId: user.uid,
         createdAt: serverTimestamp(),
         description: formData.description,
-        status: "pending" 
+        status: "pending" // Required for the admin approval workflow
       };
 
       addDocumentNonBlocking(collection(db, "product_listings"), listingData);

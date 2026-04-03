@@ -13,6 +13,7 @@ import Image from "next/image";
 
 /**
  * BrowsePage displays a real-time list of approved products from the marketplace.
+ * It strictly follows the rules of listing within a 50-item limit for security and performance.
  */
 export default function BrowsePage() {
   const db = useFirestore();
@@ -58,6 +59,7 @@ export default function BrowsePage() {
                   alt={item.title} 
                   fill 
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
               </div>
