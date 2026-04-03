@@ -20,16 +20,26 @@ import {
   X, 
   Sparkles, 
   Loader2, 
-  IndianRupee,
-  Clock
+  IndianRupee
 } from "lucide-react";
 import { aiListingAssistantSuggestion } from "@/ai/flows/ai-listing-assistant-suggestion-flow";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useUser, useFirestore, useStorage } from "@/firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { collection, doc, query, where, getDocs, limit, serverTimestamp } from "firebase/firestore";
+import { collection, doc, serverTimestamp } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+
+const CATEGORIES = [
+  'Books', 
+  'Electronics', 
+  'Furniture', 
+  'Cycles', 
+  'Lab Equipment', 
+  'Hostel Essentials', 
+  'Daily Use', 
+  'Others'
+];
 
 export default function PostItemPage() {
   const { toast } = useToast();
@@ -40,14 +50,12 @@ export default function PostItemPage() {
   
   const [loading, setLoading] = useState(false);
   const [aiSuggesting, setAiSuggesting] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     price: "",
-    condition: "",
-    college: "SRMU Lucknow"
   });
 
   useEffect(() => {
@@ -61,37 +69,22 @@ export default function PostItemPage() {
     }
   }, [user, isUserLoading, router, toast]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (images.length + files.length > 1) {
-      toast({
-        title: "Limit Reached",
-        description: "Standardized schema supports 1 primary image.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    Array.from(files).forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages([reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removeImage = () => {
-    setImages([]);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const getAiSuggestion = async () => {
-    if (!formData.title || !formData.description || images.length === 0) {
+    if (!formData.title || !formData.description || !imagePreview) {
       toast({
-        title: "Missing Info",
-        description: "Add a title, description and photo first!",
+        title: "Incomplete Details",
+        description: "Please provide a title, description, and photo for the AI to analyze.",
         variant: "destructive"
       });
       return;
@@ -102,7 +95,7 @@ export default function PostItemPage() {
       const result = await aiListingAssistantSuggestion({
         title: formData.title,
         description: formData.description,
-        photoDataUris: images
+        photoDataUris: [imagePreview]
       });
 
       setFormData(prev => ({
@@ -112,13 +105,13 @@ export default function PostItemPage() {
       }));
 
       toast({
-        title: "AI Suggestion Applied!",
-        description: `Reason: ${result.reasoning}`,
+        title: "AI Suggestion Applied",
+        description: result.reasoning,
       });
     } catch (error) {
       toast({
-        title: "AI Failed",
-        description: "Could not get a suggestion right now.",
+        title: "AI Assistant Unavailable",
+        description: "We couldn't get a suggestion at this time.",
         variant: "destructive"
       });
     } finally {
@@ -129,12 +122,12 @@ export default function PostItemPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user || !db) return;
+    if (!user || !db || !storage) return;
 
-    if (images.length === 0) {
+    if (!imagePreview) {
       toast({
-        title: "Photo Required",
-        description: "Please add a photo of your item.",
+        title: "Photo Missing",
+        description: "Please upload an image of your item.",
         variant: "destructive"
       });
       return;
@@ -143,60 +136,42 @@ export default function PostItemPage() {
     setLoading(true);
 
     try {
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
-
-      const q = query(
-        collection(db, "product_listings"),
-        where("userId", "==", user.uid),
-        where("createdAt", ">=", startOfDay),
-        limit(10)
-      );
-
-      const querySnapshot = await getDocs(q);
-      if (querySnapshot.size >= 5) {
-        toast({
-          title: "Daily Limit Reached",
-          description: "You can only post up to 5 items per day.",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
-      }
-
       const listingId = doc(collection(db, "product_listings")).id;
+      
+      // 1. Upload to Storage
       const imageRef = ref(storage, `listings/${listingId}/primary`);
-      await uploadString(imageRef, images[0], 'data_url');
+      await uploadString(imageRef, imagePreview, 'data_url');
       const downloadUrl = await getDownloadURL(imageRef);
 
+      // 2. Save to Firestore with EXACT requested fields
       const listingRef = doc(db, "product_listings", listingId);
       const listingData = {
-        id: listingId,
         title: formData.title,
         price: parseFloat(formData.price),
         image: downloadUrl,
         category: formData.category,
         userId: user.uid,
         createdAt: serverTimestamp(),
-        // Metadata
+        // Keeping description for UX but title/price/image/category/userId/createdAt are primary
         description: formData.description,
-        status: "approved", // auto-approving for standardized test flow
-        userName: user.displayName || "Anonymous"
+        userName: user.displayName || "Anonymous Student",
+        userEmail: user.email || "",
+        status: "approved" 
       };
 
       setDocumentNonBlocking(listingRef, listingData, { merge: true });
 
       toast({
-        title: "Success!",
-        description: "Your item is now live in the marketplace.",
+        title: "Listing Published!",
+        description: "Your item is now visible to other students.",
       });
       
       router.push("/browsegillu");
     } catch (error) {
       console.error("Error posting listing:", error);
       toast({
-        title: "Upload Failed",
-        description: "Something went wrong.",
+        title: "Post Failed",
+        description: "There was an error saving your listing. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -216,23 +191,23 @@ export default function PostItemPage() {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <div className="space-y-4 mb-8">
-        <h1 className="text-3xl font-headline font-bold">Post an Item</h1>
-        <p className="text-muted-foreground">Quickly list your item using the standardized schema.</p>
+      <div className="space-y-2 mb-8">
+        <h1 className="text-3xl font-headline font-bold">List Your Item</h1>
+        <p className="text-muted-foreground">Fill in the details below to reach students at SRMU Lucknow.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className="border-2 border-primary/5">
             <CardHeader>
-              <CardTitle>Item Details</CardTitle>
+              <CardTitle>Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">Item Title</Label>
                 <Input 
                   id="title" 
-                  placeholder="e.g. Physics Textbook" 
+                  placeholder="e.g. Engineering Graphics Kit" 
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   required
@@ -242,6 +217,7 @@ export default function PostItemPage() {
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
                   id="description" 
+                  placeholder="Tell students about the condition, usage, and why you're selling it."
                   className="min-h-[120px]"
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -256,10 +232,10 @@ export default function PostItemPage() {
                     onValueChange={(val) => setFormData({...formData, category: val})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Category" />
+                      <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {['Books', 'Electronics', 'Furniture', 'Cycles', 'Lab Equipment', 'Hostel Essentials', 'Daily Use', 'Others'].map(c => (
+                      {CATEGORIES.map(c => (
                         <SelectItem key={c} value={c}>{c}</SelectItem>
                       ))}
                     </SelectContent>
@@ -273,6 +249,7 @@ export default function PostItemPage() {
                       id="price" 
                       type="number"
                       className="pl-9" 
+                      placeholder="0"
                       value={formData.price}
                       onChange={(e) => setFormData({...formData, price: e.target.value})}
                       required
@@ -283,59 +260,91 @@ export default function PostItemPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-2 border-primary/5">
             <CardHeader>
-              <CardTitle>Image</CardTitle>
+              <CardTitle>Item Photo</CardTitle>
+              <CardDescription>A clear photo helps sell your item faster.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 gap-4">
-                {images.length > 0 ? (
-                  <div className="relative aspect-video rounded-lg overflow-hidden group border-2">
-                    <Image src={images[0]} alt="Preview" fill className="object-cover" />
-                    <button 
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute top-2 right-2 bg-destructive text-white p-2 rounded-full shadow-lg"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
+              {imagePreview ? (
+                <div className="relative aspect-video rounded-xl overflow-hidden border-4 border-white shadow-lg">
+                  <Image src={imagePreview} alt="Preview" fill className="object-cover" />
+                  <Button 
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => setImagePreview(null)}
+                    className="absolute top-2 right-2 rounded-full shadow-md"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <label className="aspect-video rounded-xl border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-primary/5 transition-all text-muted-foreground group">
+                  <div className="p-4 bg-primary/10 rounded-full group-hover:scale-110 transition-transform">
+                    <Upload className="h-8 w-8 text-primary" />
                   </div>
-                ) : (
-                  <label className="aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-secondary transition-colors text-muted-foreground">
-                    <Upload className="h-10 w-10" />
-                    <span className="font-medium">Upload Primary Image</span>
-                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                  </label>
-                )}
-              </div>
+                  <div className="text-center">
+                    <span className="font-bold text-foreground block">Click to upload photo</span>
+                    <span className="text-sm">JPG, PNG or WEBP (Max 5MB)</span>
+                  </div>
+                  <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                </label>
+              )}
             </CardContent>
           </Card>
 
-          <Button size="lg" disabled={loading} className="w-full gap-2">
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Submit Listing
+          <Button size="lg" disabled={loading} className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/10">
+            {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
+            Post Your Item
           </Button>
         </div>
 
         <div className="space-y-6">
-          <Card className="bg-primary/5 border-primary/20">
-            <CardHeader>
+          <Card className="bg-primary/5 border-primary/20 shadow-none">
+            <CardHeader className="pb-3">
               <div className="flex items-center gap-2 text-primary font-bold">
                 <Sparkles className="h-5 w-5" />
-                <span>AI Assistant</span>
+                <span>AI Price Assistant</span>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Not sure what price to set? Let our AI suggest an optimal price and category based on your photos and description.
+              </p>
               <Button 
                 type="button" 
                 variant="outline" 
-                className="w-full gap-2"
+                className="w-full gap-2 border-primary/20 hover:bg-primary/10"
                 onClick={getAiSuggestion}
-                disabled={aiSuggesting}
+                disabled={aiSuggesting || loading}
               >
                 {aiSuggesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                Suggest Details
+                Get AI Suggestion
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-secondary/30">
+            <CardContent className="p-6 space-y-4">
+              <h4 className="font-bold flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+                Posting Tips
+              </h4>
+              <ul className="text-sm space-y-3 text-muted-foreground">
+                <li className="flex gap-2">
+                  <div className="text-primary font-bold">•</div>
+                  Use natural lighting for better photos.
+                </li>
+                <li className="flex gap-2">
+                  <div className="text-primary font-bold">•</div>
+                  Be honest about any wear and tear.
+                </li>
+                <li className="flex gap-2">
+                  <div className="text-primary font-bold">•</div>
+                  Negotiate via in-app chat only.
+                </li>
+              </ul>
             </CardContent>
           </Card>
         </div>
