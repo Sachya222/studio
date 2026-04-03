@@ -25,10 +25,9 @@ import {
 import { aiListingAssistantSuggestion } from "@/ai/flows/ai-listing-assistant-suggestion-flow";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { useUser, useFirestore, useStorage } from "@/firebase";
+import { useUser, useFirestore, useStorage, addDocumentNonBlocking } from "@/firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { collection, doc, serverTimestamp } from "firebase/firestore";
-import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { collection, serverTimestamp } from "firebase/firestore";
 
 const CATEGORIES = [
   'Books', 
@@ -136,34 +135,32 @@ export default function PostItemPage() {
     setLoading(true);
 
     try {
-      const listingId = doc(collection(db, "product_listings")).id;
-      
-      // 1. Upload to Storage
-      const imageRef = ref(storage, `listings/${listingId}/primary`);
+      // 1. Upload image to storage
+      const tempId = Math.random().toString(36).substring(7);
+      const imageRef = ref(storage, `listings/${user.uid}/${tempId}`);
       await uploadString(imageRef, imagePreview, 'data_url');
-      const downloadUrl = await getDownloadURL(imageRef);
+      
+      // 2. Get download URL
+      const imageUrl = await getDownloadURL(imageRef);
 
-      // 2. Save to Firestore with EXACT requested fields
-      const listingRef = doc(db, "product_listings", listingId);
+      // 3. Save in firestore
       const listingData = {
         title: formData.title,
         price: parseFloat(formData.price),
-        image: downloadUrl,
+        image: imageUrl,
         category: formData.category,
         userId: user.uid,
         createdAt: serverTimestamp(),
-        // Keeping description for UX but title/price/image/category/userId/createdAt are primary
+        // Status and description kept for platform functionality
         description: formData.description,
-        userName: user.displayName || "Anonymous Student",
-        userEmail: user.email || "",
         status: "approved" 
       };
 
-      setDocumentNonBlocking(listingRef, listingData, { merge: true });
+      addDocumentNonBlocking(collection(db, "product_listings"), listingData);
 
       toast({
         title: "Listing Published!",
-        description: "Your item is now visible to other students.",
+        description: "Your item is now live in the marketplace.",
       });
       
       router.push("/browsegillu");
@@ -171,7 +168,7 @@ export default function PostItemPage() {
       console.error("Error posting listing:", error);
       toast({
         title: "Post Failed",
-        description: "There was an error saving your listing. Please try again.",
+        description: "There was an error saving your listing.",
         variant: "destructive"
       });
     } finally {
@@ -193,21 +190,21 @@ export default function PostItemPage() {
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="space-y-2 mb-8">
         <h1 className="text-3xl font-headline font-bold">List Your Item</h1>
-        <p className="text-muted-foreground">Fill in the details below to reach students at SRMU Lucknow.</p>
+        <p className="text-muted-foreground">Reach students at SRMU Lucknow instantly.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-2 border-primary/5">
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>Item Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Item Title</Label>
+                <Label htmlFor="title">Title</Label>
                 <Input 
                   id="title" 
-                  placeholder="e.g. Engineering Graphics Kit" 
+                  placeholder="e.g. Engineering Mathematics Textbook" 
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   required
@@ -217,7 +214,7 @@ export default function PostItemPage() {
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
                   id="description" 
-                  placeholder="Tell students about the condition, usage, and why you're selling it."
+                  placeholder="Condition, year, usage details..."
                   className="min-h-[120px]"
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -262,8 +259,8 @@ export default function PostItemPage() {
 
           <Card className="border-2 border-primary/5">
             <CardHeader>
-              <CardTitle>Item Photo</CardTitle>
-              <CardDescription>A clear photo helps sell your item faster.</CardDescription>
+              <CardTitle>Photo</CardTitle>
+              <CardDescription>Upload a clear image of your item.</CardDescription>
             </CardHeader>
             <CardContent>
               {imagePreview ? (
@@ -296,7 +293,7 @@ export default function PostItemPage() {
 
           <Button size="lg" disabled={loading} className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/10">
             {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
-            Post Your Item
+            Post Now
           </Button>
         </div>
 
@@ -310,7 +307,7 @@ export default function PostItemPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Not sure what price to set? Let our AI suggest an optimal price and category based on your photos and description.
+                Let AI analyze your photo and description to suggest the best price for the SRMU Lucknow campus.
               </p>
               <Button 
                 type="button" 
@@ -322,29 +319,6 @@ export default function PostItemPage() {
                 {aiSuggesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 Get AI Suggestion
               </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none bg-secondary/30">
-            <CardContent className="p-6 space-y-4">
-              <h4 className="font-bold flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                Posting Tips
-              </h4>
-              <ul className="text-sm space-y-3 text-muted-foreground">
-                <li className="flex gap-2">
-                  <div className="text-primary font-bold">•</div>
-                  Use natural lighting for better photos.
-                </li>
-                <li className="flex gap-2">
-                  <div className="text-primary font-bold">•</div>
-                  Be honest about any wear and tear.
-                </li>
-                <li className="flex gap-2">
-                  <div className="text-primary font-bold">•</div>
-                  Negotiate via in-app chat only.
-                </li>
-              </ul>
             </CardContent>
           </Card>
         </div>

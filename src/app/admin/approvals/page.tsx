@@ -58,7 +58,7 @@ export default function AdminApprovalsPage() {
     return query(
       collection(db, "product_listings"),
       where("status", "==", "pending"),
-      orderBy("postedDate", "desc"),
+      orderBy("createdAt", "desc"),
       limit(50)
     );
   }, [db, adminData]);
@@ -114,7 +114,7 @@ export default function AdminApprovalsPage() {
             <Card key={listing.id} className="overflow-hidden flex flex-col shadow-lg border-2 border-primary/10">
               <div className="relative aspect-video">
                 <Image 
-                  src={listing.imageUrls?.[0] || "https://picsum.photos/seed/placeholder/400/300"} 
+                  src={listing.image || "https://picsum.photos/seed/placeholder/400/300"} 
                   alt={listing.title} 
                   fill 
                   className="object-cover"
