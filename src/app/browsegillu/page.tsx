@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, where } from "firebase/firestore";
+import { collection, query, orderBy, where, limit } from "firebase/firestore";
 import { 
   Card, 
   CardContent, 
@@ -20,12 +19,14 @@ export default function BrowsePage() {
   const db = useFirestore();
 
   // Requirements: Fetch approved products, real-time listener, sort by createdAt descending.
+  // Added limit(50) to ensure consistent performance and compliance with security best practices.
   const listingsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(
       collection(db, "product_listings"),
       where("status", "==", "approved"),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
+      limit(50)
     );
   }, [db]);
 

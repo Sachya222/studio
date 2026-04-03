@@ -2,17 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Deployment poke to ensure immediate update and propagation of new rules.
-    // Updated at: 2024-05-24T12:00:00Z
+    // Updated at: 2024-05-24T16:00:00Z
 
     // product listings
     match /product_listings/{id} {
-      allow read: if true;
+      // Allow public listing and getting for everyone
+      // This is necessary for the marketplace browse functionality
+      allow list: if true;
+      allow get: if true;
+      
+      // Allow creation and updates for authenticated users
+      // Note: Admin logic and owner logic can be further refined here
       allow write: if request.auth != null;
     }
 
-    // users (optional)
+    // users profiles
     match /users/{userId} {
       allow read, write: if request.auth != null;
+    }
+    
+    // admin roles for the approval system
+    match /roles_admin/{userId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Controlled via Firebase Console for security
     }
   }
 }
