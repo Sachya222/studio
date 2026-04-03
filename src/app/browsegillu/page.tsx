@@ -11,13 +11,10 @@ import {
 import { Loader2, IndianRupee, PackageOpen } from "lucide-react";
 import Image from "next/image";
 
-/**
- * BrowsePage displays a real-time list of products from the marketplace.
- * It strictly follows the requested schema: title, price, image, category, userId, createdAt.
- */
 export default function BrowsePage() {
   const db = useFirestore();
 
+  // Optimized real-time query for product_listings
   const listingsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(

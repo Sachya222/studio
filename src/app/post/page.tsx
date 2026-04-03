@@ -60,6 +60,7 @@ export default function PostItemPage() {
   });
 
   useEffect(() => {
+    // Only redirect if auth loading is finished and user is definitely null
     if (!isUserLoading && !user) {
       toast({
         title: "Authentication Required",
@@ -168,7 +169,7 @@ export default function PostItemPage() {
       await uploadString(imageRef, imagePreview, 'data_url');
       const imageUrl = await getDownloadURL(imageRef);
 
-      // Save to firestore with EXACT requested fields
+      // EXACT required fields: title, price, image, category, userId, createdAt
       const listingData = {
         title: formData.title,
         price: parseFloat(formData.price),
@@ -176,7 +177,7 @@ export default function PostItemPage() {
         category: formData.category,
         userId: user.uid,
         createdAt: serverTimestamp(),
-        description: formData.description // Keep description for detail views
+        description: formData.description // Keep for details
       };
 
       await addDocumentNonBlocking(collection(db, "product_listings"), listingData);

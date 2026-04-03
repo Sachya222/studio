@@ -5,8 +5,9 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore, doc, getDoc } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { FirebaseStorage } from 'firebase/storage';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useRouter } from 'next/navigation';
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -58,6 +59,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   auth,
   storage,
 }) => {
+  const router = useRouter();
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     isUserLoading: true,
@@ -70,11 +72,14 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    // Capture successful redirect logins on component mount
+    let isSubscribed = true;
+
+    // Handle redirect results for Google Login
     getRedirectResult(auth)
       .then((result) => {
-        if (result?.user) {
-          console.log("FirebaseProvider: Captured redirect login for", result.user.email);
+        if (result?.user && isSubscribed) {
+          console.log("FirebaseProvider: Redirect login success for", result.user.email);
+          router.push('/browsegillu');
         }
       })
       .catch(e => {
@@ -106,15 +111,28 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
             console.error("Error checking/creating user profile:", e);
           }
         }
-        setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
+        
+        if (isSubscribed) {
+          setUserAuthState({ 
+            user: firebaseUser, 
+            isUserLoading: false, 
+            userError: null 
+          });
+        }
       },
       (error) => {
         console.error("FirebaseProvider: onAuthStateChanged error:", error);
-        setUserAuthState({ user: null, isUserLoading: false, userError: error });
+        if (isSubscribed) {
+          setUserAuthState({ user: null, isUserLoading: false, userError: error });
+        }
       }
     );
-    return () => unsubscribe();
-  }, [auth, firestore]);
+
+    return () => {
+      isSubscribed = false;
+      unsubscribe();
+    };
+  }, [auth, firestore, router]);
 
   const contextValue = useMemo((): FirebaseContextState => {
     const servicesAvailable = !!(firebaseApp && firestore && auth && storage);
