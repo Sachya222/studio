@@ -70,10 +70,16 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    // Handle the redirect result once on mount
-    getRedirectResult(auth).catch(e => {
-      console.error("FirebaseProvider: getRedirectResult error:", e);
-    });
+    // Capture successful redirect logins on component mount
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          console.log("FirebaseProvider: Captured redirect login for", result.user.email);
+        }
+      })
+      .catch(e => {
+        console.error("FirebaseProvider: getRedirectResult error:", e);
+      });
 
     const unsubscribe = onAuthStateChanged(
       auth,

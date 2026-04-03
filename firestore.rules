@@ -1,11 +1,12 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Deployment poke: 2024-05-24T20:45:00Z
+    // Deployment poke: 2024-05-24T21:15:00Z
 
-    // product listings - Publicly readable, authenticated write
+    // product listings - Publicly readable with query limits, authenticated write
     match /product_listings/{id} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if request.query.limit <= 50;
       allow write: if request.auth != null;
     }
 
@@ -14,7 +15,7 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
     
-    // admin roles (if used)
+    // admin roles
     match /roles_admin/{userId} {
       allow read: if request.auth != null;
     }
