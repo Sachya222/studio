@@ -20,14 +20,15 @@ import {
   X, 
   Sparkles, 
   Loader2, 
-  IndianRupee
+  IndianRupee,
+  AlertTriangle
 } from "lucide-react";
 import { aiListingAssistantSuggestion } from "@/ai/flows/ai-listing-assistant-suggestion-flow";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useUser, useFirestore, useStorage, addDocumentNonBlocking } from "@/firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { collection, serverTimestamp } from "firebase/firestore";
+import { collection, serverTimestamp, query, where, getDocs, Timestamp } from "firebase/firestore";
 
 const CATEGORIES = [
   'Books', 
@@ -39,6 +40,8 @@ const CATEGORIES = [
   'Daily Use', 
   'Others'
 ];
+
+const DAILY_UPLOAD_LIMIT = 5;
 
 export default function PostItemPage() {
   const { toast } = useToast();
@@ -118,6 +121,21 @@ export default function PostItemPage() {
     }
   };
 
+  const checkDailyLimit = async (userId: string) => {
+    if (!db) return false;
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    
+    const q = query(
+      collection(db, "product_listings"),
+      where("userId", "==", userId),
+      where("createdAt", ">=", Timestamp.fromDate(startOfToday))
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.size < DAILY_UPLOAD_LIMIT;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -135,6 +153,18 @@ export default function PostItemPage() {
     setLoading(true);
 
     try {
+      // 0. Check daily limit
+      const canUpload = await checkDailyLimit(user.uid);
+      if (!canUpload) {
+        toast({
+          title: "Limit Reached",
+          description: `You can only upload ${DAILY_UPLOAD_LIMIT} items per day.`,
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
       // 1. Upload image to storage
       const tempId = Math.random().toString(36).substring(7);
       const imageRef = ref(storage, `listings/${user.uid}/${tempId}`);
@@ -143,7 +173,7 @@ export default function PostItemPage() {
       // 2. Get download URL
       const imageUrl = await getDownloadURL(imageRef);
 
-      // 3. Save in firestore
+      // 3. Save in firestore using required schema
       const listingData = {
         title: formData.title,
         price: parseFloat(formData.price),
@@ -151,16 +181,15 @@ export default function PostItemPage() {
         category: formData.category,
         userId: user.uid,
         createdAt: serverTimestamp(),
-        // Status and description kept for platform functionality
         description: formData.description,
-        status: "approved" 
+        status: "pending" 
       };
 
       addDocumentNonBlocking(collection(db, "product_listings"), listingData);
 
       toast({
-        title: "Listing Published!",
-        description: "Your item is now live in the marketplace.",
+        title: "Listing Submitted",
+        description: "Your item has been sent for approval.",
       });
       
       router.push("/browsegillu");
@@ -293,7 +322,7 @@ export default function PostItemPage() {
 
           <Button size="lg" disabled={loading} className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/10">
             {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
-            Post Now
+            Post for Approval
           </Button>
         </div>
 
@@ -319,6 +348,16 @@ export default function PostItemPage() {
                 {aiSuggesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 Get AI Suggestion
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-amber-200 bg-amber-50/50">
+            <CardContent className="p-4 flex gap-3 text-amber-800">
+              <AlertTriangle className="h-5 w-5 shrink-0" />
+              <div className="text-xs space-y-1">
+                <p className="font-bold">Community Rules</p>
+                <p>Maximum 5 uploads per day allowed per student.</p>
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -1,60 +1,45 @@
+
 {
   "entities": {
     "UserProfile": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "UserProfile",
       "type": "object",
-      "description": "Represents a student user within the CampusCycle platform, storing their profile information and linking to their activities.",
+      "description": "Represents a student user within the CampusCycle platform.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the UserProfile entity, typically correlating with the user's UID from the authentication system."
+          "description": "Unique identifier (UID)."
         },
         "fullName": {
-          "type": "string",
-          "description": "The full name of the user as provided during registration or from their social login."
+          "type": "string"
         },
         "email": {
           "type": "string",
-          "description": "The email address of the user, used for college verification and as a login identifier. (Provided by external authentication system)",
           "format": "email"
         },
         "collegeName": {
-          "type": "string",
-          "description": "The name of the college the user belongs to, crucial for campus-exclusive features."
+          "type": "string"
         },
         "courseYear": {
-          "type": "string",
-          "description": "The user's current course of study and academic year."
+          "type": "string"
         },
         "profilePhotoUrl": {
           "type": "string",
-          "description": "URL to the user's profile picture, allowing for personalization.",
           "format": "uri"
         },
         "isVerified": {
-          "type": "boolean",
-          "description": "A boolean flag indicating if the user's college email has been successfully verified, granting full platform access."
+          "type": "boolean"
         },
         "averageRating": {
-          "type": "number",
-          "description": "The average rating received by the user as a seller, calculated from all their reviews."
+          "type": "number"
         },
         "joinedDate": {
           "type": "string",
-          "description": "The date and time when the user registered and officially joined the CampusCycle platform.",
           "format": "date-time"
         },
-        "wishlistListingIds": {
-          "type": "array",
-          "description": "An array of references to ProductListing entities that the user has added to their wishlist for future consideration. (Relationship: UserProfile N:N ProductListing)",
-          "items": {
-            "type": "string"
-          }
-        },
         "role": {
-          "type": "string",
-          "description": "The role of the user within the platform (e.g., 'student' for regular users, 'admin' for platform administrators)."
+          "type": "string"
         }
       },
       "required": [
@@ -71,296 +56,65 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ProductListing",
       "type": "object",
-      "description": "Represents a single second-hand item posted for sale by a student on the CampusCycle marketplace.",
+      "description": "Represents a single second-hand item posted for sale.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the ProductListing entity."
+          "type": "string"
         },
         "title": {
-          "type": "string",
-          "description": "The concise and descriptive title of the product being sold."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the product, including its features, usage, and any relevant condition notes."
-        },
-        "category": {
-          "type": "string",
-          "description": "The classification of the product, such as 'Books', 'Electronics', 'Furniture', etc."
+          "type": "string"
         },
         "price": {
-          "type": "number",
-          "description": "The selling price of the product, denominated in the local currency."
+          "type": "number"
         },
-        "condition": {
+        "image": {
           "type": "string",
-          "description": "The physical condition of the product, typically categorized as 'New', 'Like New', or 'Used'."
+          "description": "The URL of the product image."
         },
-        "collegeLocation": {
+        "category": {
+          "type": "string"
+        },
+        "userId": {
           "type": "string",
-          "description": "The specific college campus or location where the item is available for pickup or exchange."
+          "description": "Reference to the seller's UID."
         },
-        "imageUrls": {
-          "type": "array",
-          "description": "An array of URLs to images showcasing the product from various angles. At least one image is required for a listing.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "sellerId": {
+        "createdAt": {
           "type": "string",
-          "description": "Reference to the UserProfile entity of the student who posted this listing for sale. (Relationship: UserProfile 1:N ProductListing)"
-        },
-        "postedDate": {
-          "type": "string",
-          "description": "The date and time when the product listing was created and published on the platform.",
           "format": "date-time"
         },
         "status": {
           "type": "string",
-          "description": "The current status of the product listing, indicating its availability (e.g., 'active', 'sold', 'pending', 'deleted')."
+          "description": "Current status: pending, approved, or sold."
+        },
+        "description": {
+          "type": "string"
         }
       },
       "required": [
-        "id",
         "title",
-        "description",
-        "category",
         "price",
-        "condition",
-        "collegeLocation",
-        "imageUrls",
-        "sellerId",
-        "postedDate",
+        "image",
+        "category",
+        "userId",
+        "createdAt",
         "status"
-      ]
-    },
-    "ChatThread": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ChatThread",
-      "type": "object",
-      "description": "Represents a private conversation thread between a buyer and a seller regarding a specific product listing.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ChatThread entity."
-        },
-        "listingId": {
-          "type": "string",
-          "description": "Reference to the ProductListing entity that this chat thread is associated with, providing context for the conversation. (Relationship: ProductListing 1:N ChatThread)"
-        },
-        "participantIds": {
-          "type": "array",
-          "description": "An array of references to the UserProfile entities (typically buyer and seller) who are participating in this chat thread. (Relationship: UserProfile N:N ChatThread)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "lastMessageTimestamp": {
-          "type": "string",
-          "description": "The timestamp of the most recent message sent in this chat thread, useful for ordering conversations in a user interface.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "listingId",
-        "participantIds"
-      ]
-    },
-    "ChatMessage": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ChatMessage",
-      "type": "object",
-      "description": "Represents an individual message sent within a ChatThread entity, facilitating real-time communication.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ChatMessage entity."
-        },
-        "chatThreadId": {
-          "type": "string",
-          "description": "Reference to the ChatThread entity this message belongs to. (Relationship: ChatThread 1:N ChatMessage)"
-        },
-        "senderId": {
-          "type": "string",
-          "description": "Reference to the UserProfile entity of the user who sent this message. (Relationship: UserProfile 1:N ChatMessage)"
-        },
-        "content": {
-          "type": "string",
-          "description": "The textual content or body of the message."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "The date and time when the message was sent.",
-          "format": "date-time"
-        },
-        "isSeen": {
-          "type": "boolean",
-          "description": "A boolean flag indicating whether the recipient(s) of the message have seen it."
-        }
-      },
-      "required": [
-        "id",
-        "chatThreadId",
-        "senderId",
-        "content",
-        "timestamp",
-        "isSeen"
-      ]
-    },
-    "Review": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Review",
-      "type": "object",
-      "description": "Represents a rating and textual feedback given by a buyer to a seller after a completed transaction.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Review entity."
-        },
-        "reviewerId": {
-          "type": "string",
-          "description": "Reference to the UserProfile entity of the user who submitted this review (the buyer). (Relationship: UserProfile 1:N Review)"
-        },
-        "sellerId": {
-          "type": "string",
-          "description": "Reference to the UserProfile entity of the seller being reviewed. (Relationship: UserProfile 1:N Review)"
-        },
-        "rating": {
-          "type": "number",
-          "description": "The star rating given to the seller, typically on a scale of 1 to 5."
-        },
-        "comment": {
-          "type": "string",
-          "description": "The textual comment or feedback provided by the reviewer about their experience with the seller."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The date and time when the review was submitted.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "reviewerId",
-        "sellerId",
-        "rating",
-        "comment",
-        "createdAt"
       ]
     }
   },
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "google.com"
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "UserProfile",
-          "schema": {
-            "$ref": "#/backend/entities/UserProfile"
-          },
-          "description": "Stores user profiles. The document ID `{userId}` directly matches the Firebase Authentication UID. Access is restricted to the owner for sensitive fields (e.g., email), while general profile information (e.g., fullName, profilePhotoUrl, averageRating) can be publicly readable. Includes denormalized 'role' for display purposes, but administrative authorization relies on the dedicated 'roles_admin' collection.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user, correlating with Firebase Auth UID."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/product_listings/{listingId}",
-        "definition": {
-          "entityName": "ProductListing",
-          "schema": {
-            "$ref": "#/backend/entities/ProductListing"
-          },
-          "description": "Stores individual product listings available for sale. Read access is generally public, enabling broad browsing. Write and delete access are restricted to the 'sellerId' specified within the document. The 'sellerId' field ensures authorization independence. The 'status' field explicitly models the listing's state (e.g., 'active', 'sold').",
-          "params": [
-            {
-              "name": "listingId",
-              "description": "The unique ID for a specific product listing."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/chat_threads/{chatThreadId}",
-        "definition": {
-          "entityName": "ChatThread",
-          "schema": {
-            "$ref": "#/backend/entities/ChatThread"
-          },
-          "description": "Represents a private conversation thread between participants regarding a specific product listing. Access (read/write) is strictly restricted to users whose UIDs are present in the 'participantIds' array. This array serves as a denormalized membership map, ensuring authorization independence for the chat thread.",
-          "params": [
-            {
-              "name": "chatThreadId",
-              "description": "The unique ID for a specific chat thread."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/chat_threads/{chatThreadId}/messages/{messageId}",
-        "definition": {
-          "entityName": "ChatMessage",
-          "schema": {
-            "$ref": "#/backend/entities/ChatMessage"
-          },
-          "description": "Stores individual messages within a specific chat thread. To strictly adhere to authorization independence, the 'participantIds' from the parent 'ChatThread' document MUST be denormalized into each 'ChatMessage' document. This allows message access rules to operate without requiring 'get()' calls to the parent. Write access is further restricted to the 'senderId' of the message.",
-          "params": [
-            {
-              "name": "chatThreadId",
-              "description": "The unique ID of the parent chat thread."
-            },
-            {
-              "name": "messageId",
-              "description": "The unique ID for a specific chat message."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/reviews/{reviewId}",
-        "definition": {
-          "entityName": "Review",
-          "schema": {
-            "$ref": "#/backend/entities/Review"
-          },
-          "description": "Stores reviews and ratings given by buyers to sellers. Reviews are publicly readable to promote transparency and trust. Write access for creating a new review is restricted to the 'reviewerId'. The 'reviewerId' and 'sellerId' fields ensure authorization independence for all review operations.",
-          "params": [
-            {
-              "name": "reviewId",
-              "description": "The unique ID for a specific review."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "AdminRole",
-          "schema": {
-            "$ref": "#/backend/entities/AdminRole"
-          },
-          "description": "A dedicated collection for managing administrative roles within the platform. The mere existence of a document at '/roles_admin/{userId}' grants administrative privileges to that 'userId'. This follows the 'existence over content' DBAC principle for global roles, ensuring authorization independence and avoiding 'get()' calls to the UserProfile for security-critical checks. Documents in this collection are typically empty.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who holds an administrative role."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore structure for CampusCycle is designed to prioritize Authorization Independence, Structural Segregation, and consistent Access Modeling, crucial for secure, scalable, and debuggable security rules. Each collection's security posture is homogeneous, simplifying rule logic and supporting efficient queries.\n\n**Authorization Independence & Denormalization:**\n*   For `UserProfile` (`/users/{userId}`), the `userId` directly correlates with `request.auth.uid`, ensuring inherent authorization independence for personal data. Some fields are publicly readable, while sensitive data is owner-restricted.\n*   `ProductListing` (`/product_listings/{listingId}`) documents are self-contained with a `sellerId` field. This denormalizes ownership, allowing `list` operations to be secured by checking `resource.data.sellerId == request.auth.uid` for write access, and `resource.data.status == 'active'` for public read access, without needing to retrieve parent data.\n*   `ChatThread` (`/chat_threads/{chatThreadId}`) utilizes a `participantIds` array, serving as a membership map. This denormalizes access control directly into the document, enabling secure read/write rules for thread participants without `get()` calls.\n*   `ChatMessage` (`/chat_threads/{chatThreadId}/messages/{messageId}`) is a subcollection of `ChatThread`. To strictly adhere to the Authorization Independence mandate, the `participantIds` from the parent `ChatThread` MUST be denormalized into each `ChatMessage` document. This ensures that any `ChatMessage` document can be authorized independently, without requiring a `get()` call to its parent `ChatThread` document in security rules. The `senderId` is also present for write rules.\n*   `Review` (`/reviews/{reviewId}`) documents contain `reviewerId` and `sellerId`, making them self-sufficient for authorization and avoiding parent dependencies. They are publicly readable for transparency, with write access restricted to the `reviewerId`.\n*   `AdminRole` (`/roles_admin/{userId}`) implements DBAC (Database Access Control) by using 'existence over content'. Admin status is determined by the presence of a document at this path, avoiding `get()` calls to `UserProfile` for critical role checks and ensuring atomic updates.\n\n**Querying and Authorization Posture (QAPs):**\n*   `UserProfile`: Securely queryable for specific `userId`s (e.g., `request.auth.uid`) or for public profile snippets (e.g., `fullName`, `averageRating`).\n*   `ProductListing`: Designed for efficient public `list` queries (e.g., `product_listings.where('collegeLocation', '==', 'SomeCollege')`). The `sellerId` allows secure `list` queries for a user's *own* listings. The `status` field further restricts visibility for active listings only.\n*   `ChatThread`: The `participantIds` array enables secure `list` queries for all chat threads a user is a part of (e.g., `chat_threads.where('participantIds', 'array-contains', request.auth.uid)`).\n*   `ChatMessage`: As a subcollection, messages can be securely listed within a specific `chatThreadId`, with the denormalized `participantIds` ensuring that only thread participants can access them.\n*   `Review`: Publicly accessible and queryable by `sellerId` to display all reviews for a specific seller's profile, or by `reviewerId` to see reviews a user has given. Write access is strictly controlled by `reviewerId`.\n*   `AdminRole`: An efficient existence check at `/roles_admin/{request.auth.uid}` allows for secure, role-based authorization for administrative actions without complex joins or `get()` operations on other collections."
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles."
+    },
+    "/product_listings/{listingId}": {
+      "schema": "ProductListing",
+      "description": "Marketplace items."
+    }
   }
 }

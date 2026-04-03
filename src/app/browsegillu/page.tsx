@@ -2,25 +2,29 @@
 "use client";
 
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy } from "firebase/firestore";
+import { collection, query, orderBy, where } from "firebase/firestore";
 import { 
   Card, 
   CardContent, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { Loader2, IndianRupee } from "lucide-react";
+import { Loader2, IndianRupee, PackageOpen } from "lucide-react";
 import Image from "next/image";
 
+/**
+ * BrowsePage displays a real-time list of approved products from the marketplace.
+ * It uses the 'product_listings' collection and sorts by 'createdAt' descending.
+ */
 export default function BrowsePage() {
   const db = useFirestore();
 
-  // Requirements: Fetch all products, real-time listener (onSnapshot via useCollection), 
-  // and sort by createdAt descending (latest first).
+  // Requirements: Fetch approved products, real-time listener, sort by createdAt descending.
   const listingsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(
       collection(db, "product_listings"),
+      where("status", "==", "approved"),
       orderBy("createdAt", "desc")
     );
   }, [db]);
@@ -29,9 +33,9 @@ export default function BrowsePage() {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-7xl">
-      <div className="mb-12">
+      <div className="mb-12 space-y-2">
         <h1 className="text-4xl font-headline font-bold text-foreground tracking-tight">Marketplace</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Browse the latest second-hand treasures from your campus community.</p>
+        <p className="text-muted-foreground text-lg">Browse items from your SRMU Lucknow community.</p>
       </div>
 
       {isLoading ? (
@@ -42,9 +46,9 @@ export default function BrowsePage() {
       ) : !listings || listings.length === 0 ? (
         <div className="text-center py-24 border-2 border-dashed rounded-3xl bg-secondary/10 flex flex-col items-center gap-4">
           <div className="p-4 bg-background rounded-full shadow-sm">
-            <IndianRupee className="h-8 w-8 text-muted-foreground" />
+            <PackageOpen className="h-8 w-8 text-muted-foreground" />
           </div>
-          <p className="text-xl text-muted-foreground font-medium">No products found.</p>
+          <p className="text-xl text-muted-foreground font-medium">No products available right now.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -64,6 +68,7 @@ export default function BrowsePage() {
                 <CardTitle className="text-lg font-bold line-clamp-1 group-hover:text-primary transition-colors duration-300">
                   {item.title}
                 </CardTitle>
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{item.category}</p>
               </CardHeader>
               <CardContent className="p-5 pt-3">
                 <div className="text-2xl font-bold text-primary flex items-center">
