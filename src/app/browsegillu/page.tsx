@@ -1,7 +1,7 @@
 "use client";
 
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, where, limit } from "firebase/firestore";
+import { collection, query, orderBy, limit } from "firebase/firestore";
 import { 
   Card, 
   CardContent, 
@@ -12,8 +12,8 @@ import { Loader2, IndianRupee, PackageOpen } from "lucide-react";
 import Image from "next/image";
 
 /**
- * BrowsePage displays a real-time list of approved products from the marketplace.
- * It strictly follows the rules of listing within a 50-item limit for security and performance.
+ * BrowsePage displays a real-time list of products from the marketplace.
+ * It strictly follows the requested schema: title, price, image, category, userId, createdAt.
  */
 export default function BrowsePage() {
   const db = useFirestore();
@@ -22,7 +22,6 @@ export default function BrowsePage() {
     if (!db) return null;
     return query(
       collection(db, "product_listings"),
-      where("status", "==", "approved"),
       orderBy("createdAt", "desc"),
       limit(50)
     );

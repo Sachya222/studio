@@ -168,7 +168,7 @@ export default function PostItemPage() {
       await uploadString(imageRef, imagePreview, 'data_url');
       const imageUrl = await getDownloadURL(imageRef);
 
-      // Exact structure as requested: title, price, image, category, userId, createdAt
+      // Save to firestore with EXACT requested fields
       const listingData = {
         title: formData.title,
         price: parseFloat(formData.price),
@@ -176,15 +176,14 @@ export default function PostItemPage() {
         category: formData.category,
         userId: user.uid,
         createdAt: serverTimestamp(),
-        description: formData.description,
-        status: "pending" // Required for the admin approval workflow
+        description: formData.description // Keep description for detail views
       };
 
-      addDocumentNonBlocking(collection(db, "product_listings"), listingData);
+      await addDocumentNonBlocking(collection(db, "product_listings"), listingData);
 
       toast({
-        title: "Listing Submitted",
-        description: "Your item has been sent for approval.",
+        title: "Listing Posted",
+        description: "Your item is now live on the marketplace.",
       });
       
       router.push("/browsegillu");
@@ -317,7 +316,7 @@ export default function PostItemPage() {
 
           <Button size="lg" disabled={loading} className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/10">
             {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
-            Post for Approval
+            Post Item
           </Button>
         </div>
 

@@ -3,7 +3,7 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore, doc, getDoc } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -70,14 +70,15 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    setUserAuthState({ user: null, isUserLoading: true, userError: null });
+    // Handle the redirect result once on mount
+    getRedirectResult(auth).catch(e => {
+      console.error("FirebaseProvider: getRedirectResult error:", e);
+    });
 
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
         if (firebaseUser) {
-          // Centrally handle user profile existence check and creation
-          // This is essential for signInWithRedirect to work correctly.
           const userRef = doc(firestore, 'users', firebaseUser.uid);
           try {
             const userSnap = await getDoc(userRef);
@@ -92,7 +93,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
                 isVerified: false,
                 averageRating: 0,
                 joinedDate: new Date().toISOString(),
-                wishlistListingIds: [],
                 role: 'student'
               }, { merge: true });
             }
