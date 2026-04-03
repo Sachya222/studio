@@ -18,7 +18,6 @@ import {
   Package, 
   Pencil, 
   Trash2, 
-  ExternalLink,
   IndianRupee,
   Plus
 } from "lucide-react";
@@ -44,8 +43,8 @@ export default function MyListingsPage() {
     if (!db || !user?.uid) return null;
     return query(
       collection(db, "product_listings"),
-      where("sellerId", "==", user.uid),
-      orderBy("postedDate", "desc"),
+      where("userId", "==", user.uid),
+      orderBy("createdAt", "desc"),
       limit(50)
     );
   }, [db, user?.uid]);
@@ -59,7 +58,7 @@ export default function MyListingsPage() {
       deleteDocumentNonBlocking(docRef);
       toast({
         title: "Listing Deleted",
-        description: "Your item has been removed from the marketplace.",
+        description: "Your item has been removed.",
       });
     }
   };
@@ -90,46 +89,33 @@ export default function MyListingsPage() {
 
       {!listings || listings.length === 0 ? (
         <Card className="border-2 border-dashed py-20 text-center flex flex-col items-center justify-center space-y-6">
-          <div className="bg-secondary p-6 rounded-full">
-            <Package className="h-12 w-12 text-primary opacity-50" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold font-headline">No listings yet</h3>
-            <p className="text-muted-foreground max-w-xs mx-auto">
-              You haven't posted any items for sale yet. Start clearing your dorm today!
-            </p>
-          </div>
+          <Package className="h-12 w-12 text-muted-foreground opacity-30" />
+          <h3 className="text-xl font-bold">No listings yet</h3>
           <Link href="/post">
-            <Button variant="outline" className="rounded-full">Post Your First Item</Button>
+            <Button variant="outline">Post Your First Item</Button>
           </Link>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {listings.map((listing) => (
-            <Card key={listing.id} className="group overflow-hidden flex flex-col">
-              <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+            <Card key={listing.id} className="overflow-hidden flex flex-col">
+              <div className="relative aspect-video bg-muted">
                 <Image 
-                  src={listing.imageUrls?.[0] || "https://picsum.photos/seed/placeholder/400/300"} 
+                  src={listing.image || "https://picsum.photos/seed/placeholder/400/300"} 
                   alt={listing.title} 
                   fill 
                   className="object-cover"
                 />
-                <Badge className="absolute top-3 left-3 bg-white/90 text-black border-none shadow-sm">
-                  {listing.status === "active" ? "Live" : listing.status}
-                </Badge>
               </div>
               <CardHeader className="p-4 space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xl font-bold text-primary flex items-center">
                     <IndianRupee className="h-4 w-4" />{listing.price}
                   </span>
-                  <Badge variant="outline" className="text-[10px] uppercase">{listing.category}</Badge>
+                  <Badge variant="secondary">{listing.category}</Badge>
                 </div>
                 <h3 className="font-bold text-lg line-clamp-1">{listing.title}</h3>
               </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0 text-sm text-muted-foreground flex-grow">
-                <p className="line-clamp-2">{listing.description}</p>
-              </CardContent>
               <CardFooter className="p-4 pt-0 border-t flex gap-2">
                 <Link href={`/edit/${listing.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full gap-2">
@@ -144,11 +130,6 @@ export default function MyListingsPage() {
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Delete
                 </Button>
-                <Link href={`/item/${listing.id}`}>
-                  <Button variant="ghost" size="icon" className="h-9 w-9">
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </Link>
               </CardFooter>
             </Card>
           ))}
