@@ -4,11 +4,10 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore, doc, getDoc } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { useRouter } from 'next/navigation';
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -71,6 +70,17 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Firebase services not provided.") });
       return;
     }
+
+    // Handle the result of a sign-in redirect
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          console.log("Successfully signed in via redirect:", result.user.displayName);
+        }
+      })
+      .catch((error) => {
+        console.error("Error handling auth redirect:", error);
+      });
 
     const unsubscribe = onAuthStateChanged(
       auth,

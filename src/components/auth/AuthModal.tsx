@@ -13,12 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { 
   GoogleAuthProvider, 
-  signInWithPopup 
+  signInWithRedirect 
 } from "firebase/auth";
 import { useAuth } from "@/firebase";
 import { LogIn, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 
 interface AuthModalProps {
   children?: React.ReactNode;
@@ -29,7 +28,6 @@ interface AuthModalProps {
 export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
   const auth = useAuth();
   const { toast } = useToast();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -42,21 +40,16 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
     });
     
     try {
-      const result = await signInWithPopup(auth, provider);
-      toast({
-        title: "Welcome!",
-        description: `Signed in as ${result.user.displayName}`,
-      });
-      if (onOpenChange) onOpenChange(false);
-      router.push('/browsegillu');
+      // Use Redirect instead of Popup for cloud development environments
+      await signInWithRedirect(auth, provider);
+      // The browser will redirect, so no further logic is needed here.
     } catch (error: any) {
       console.error("Auth error:", error);
       toast({
         variant: "destructive",
         title: "Authentication Failed",
-        description: error.message || "Failed to sign in with Google.",
+        description: error.message || "Failed to initiate sign-in.",
       });
-    } finally {
       setIsLoading(false);
     }
   };
