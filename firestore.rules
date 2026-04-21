@@ -19,6 +19,6 @@ service cloud.firestore {
       allow read: if request.auth != null;
     }
 
-    // Deployment poke: 2024-05-24T23:45:00Z
+    // Deployment poke for robust auth handling: 2024-05-25T10:00:00Z
   }
 }

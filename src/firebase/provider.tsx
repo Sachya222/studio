@@ -52,6 +52,10 @@ export interface UserHookResult {
 
 export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
 
+/**
+ * Provider component that initializes Firebase services and monitors auth state.
+ * Specifically handles the result of signInWithRedirect.
+ */
 export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   children,
   firebaseApp,
@@ -71,7 +75,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    // Handle the result of a sign-in redirect
+    // Handle the result of a sign-in redirect when the page reloads
     getRedirectResult(auth)
       .then((result) => {
         if (result?.user) {
@@ -82,11 +86,12 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         console.error("Error handling auth redirect:", error);
       });
 
+    // Listen for authentication state changes (login, logout, session persistence)
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
         if (firebaseUser) {
-          // Initialize/Update User Profile in Firestore
+          // Sync User Profile to Firestore to ensure we have record of the student
           const userRef = doc(firestore, 'users', firebaseUser.uid);
           try {
             const userSnap = await getDoc(userRef);
@@ -105,7 +110,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
               }, { merge: true });
             }
           } catch (e) {
-            console.error("Error creating user profile:", e);
+            console.error("Error syncing user profile:", e);
           }
         }
         

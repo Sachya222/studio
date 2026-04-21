@@ -25,6 +25,10 @@ interface AuthModalProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+/**
+ * A modal for user authentication.
+ * Uses signInWithRedirect for compatibility with cloud workstation environments.
+ */
 export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
   const auth = useAuth();
   const { toast } = useToast();
@@ -41,8 +45,8 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
     
     try {
       // Use Redirect instead of Popup for cloud development environments
+      // This initiates the redirect to the Google login page.
       await signInWithRedirect(auth, provider);
-      // The browser will redirect, so no further logic is needed here.
     } catch (error: any) {
       console.error("Auth error:", error);
       toast({
