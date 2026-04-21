@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore, doc, getDoc } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -59,7 +60,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   auth,
   storage,
 }) => {
-  const router = useRouter();
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     isUserLoading: true,
@@ -72,24 +72,11 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    let isSubscribed = true;
-
-    // Handle redirect results for Google Login
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user && isSubscribed) {
-          console.log("FirebaseProvider: Redirect login success for", result.user.email);
-          router.push('/browsegillu');
-        }
-      })
-      .catch(e => {
-        console.error("FirebaseProvider: getRedirectResult error:", e);
-      });
-
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
         if (firebaseUser) {
+          // Initialize/Update User Profile in Firestore
           const userRef = doc(firestore, 'users', firebaseUser.uid);
           try {
             const userSnap = await getDoc(userRef);
@@ -101,38 +88,31 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
                 collegeName: 'SRMU Lucknow', 
                 courseYear: 'Not Specified',
                 profilePhotoUrl: firebaseUser.photoURL || '',
-                isVerified: false,
+                isVerified: firebaseUser.emailVerified || false,
                 averageRating: 0,
                 joinedDate: new Date().toISOString(),
                 role: 'student'
               }, { merge: true });
             }
           } catch (e) {
-            console.error("Error checking/creating user profile:", e);
+            console.error("Error creating user profile:", e);
           }
         }
         
-        if (isSubscribed) {
-          setUserAuthState({ 
-            user: firebaseUser, 
-            isUserLoading: false, 
-            userError: null 
-          });
-        }
+        setUserAuthState({ 
+          user: firebaseUser, 
+          isUserLoading: false, 
+          userError: null 
+        });
       },
       (error) => {
-        console.error("FirebaseProvider: onAuthStateChanged error:", error);
-        if (isSubscribed) {
-          setUserAuthState({ user: null, isUserLoading: false, userError: error });
-        }
+        console.error("Auth state change error:", error);
+        setUserAuthState({ user: null, isUserLoading: false, userError: error });
       }
     );
 
-    return () => {
-      isSubscribed = false;
-      unsubscribe();
-    };
-  }, [auth, firestore, router]);
+    return () => unsubscribe();
+  }, [auth, firestore]);
 
   const contextValue = useMemo((): FirebaseContextState => {
     const servicesAvailable = !!(firebaseApp && firestore && auth && storage);
@@ -164,7 +144,7 @@ export const useFirebase = (): FirebaseServicesAndUser => {
   }
 
   if (!context.areServicesAvailable || !context.firebaseApp || !context.firestore || !context.auth || !context.storage) {
-    throw new Error('Firebase core services not available. Check FirebaseProvider props.');
+    throw new Error('Firebase core services not available.');
   }
 
   return {

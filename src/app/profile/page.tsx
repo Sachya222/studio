@@ -1,4 +1,5 @@
-"use client";
+
+'use client';
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -15,29 +16,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
-  User, 
+  User as UserIcon, 
   Mail, 
   GraduationCap, 
   Calendar, 
-  Star, 
   ShieldCheck,
   Loader2,
-  Settings
+  Settings,
+  Package
 } from "lucide-react";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push("/");
     }
   }, [user, isUserLoading, router]);
 
-  // Fetch extended profile data from Firestore
   const userDocRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, "users", user.uid);
@@ -66,7 +66,7 @@ export default function ProfilePage() {
               <Avatar className="w-24 h-24 mx-auto border-4 border-white shadow-lg">
                 <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
                 <AvatarFallback className="bg-secondary text-primary text-2xl font-bold">
-                  {user.displayName?.charAt(0) || <User className="w-12 h-12" />}
+                  {user.displayName?.charAt(0) || <UserIcon className="w-12 h-12" />}
                 </AvatarFallback>
               </Avatar>
               <div className="mt-4 space-y-1">
@@ -83,15 +83,11 @@ export default function ProfilePage() {
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Rating</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-primary">0</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Sales</div>
-                </div>
               </div>
 
               <div className="mt-6">
                 <Button variant="outline" size="sm" className="w-full gap-2 rounded-full">
-                  <Settings className="h-4 w-4" /> Edit Profile
+                  <Settings className="h-4 w-4" /> Account Settings
                 </Button>
               </div>
             </CardContent>
@@ -101,15 +97,15 @@ export default function ProfilePage() {
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center gap-2 text-accent font-bold">
                 <ShieldCheck className="h-5 w-5" />
-                <span>Verification Status</span>
+                <span>Verification</span>
               </div>
-              {profile?.isVerified ? (
+              {profile?.isVerified || user.emailVerified ? (
                 <Badge className="bg-accent hover:bg-accent text-white">Verified Student</Badge>
               ) : (
                 <div className="space-y-3">
                   <Badge variant="outline" className="border-amber-500 text-amber-600">Verification Pending</Badge>
-                  <p className="text-xs text-muted-foreground">
-                    Please check your student email to verify your account and start selling.
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Check your email to verify your status as a student.
                   </p>
                 </div>
               )}
@@ -121,29 +117,23 @@ export default function ProfilePage() {
         <div className="md:col-span-2 space-y-6">
           <Card className="border-none shadow-lg">
             <CardHeader>
-              <CardTitle className="font-headline font-bold">Campus Information</CardTitle>
-              <CardDescription>Details shared with potential buyers/sellers</CardDescription>
+              <CardTitle className="font-headline font-bold">Campus Details</CardTitle>
+              <CardDescription>Verified information from SRMU Lucknow</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <GraduationCap className="h-3 w-3" /> College/University
+                  <GraduationCap className="h-3 w-3" /> Campus Location
                 </div>
                 <div className="font-medium">{profile?.collegeName || "SRMU Lucknow"}</div>
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Joined CampusCycle
+                  <Calendar className="h-3 w-3" /> Member Since
                 </div>
                 <div className="font-medium">
                   {profile?.joinedDate ? new Date(profile.joinedDate).toLocaleDateString() : "Recently"}
                 </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <User className="h-3 w-3" /> Course & Year
-                </div>
-                <div className="font-medium">{profile?.courseYear || "Not Specified"}</div>
               </div>
             </CardContent>
           </Card>
@@ -151,23 +141,27 @@ export default function ProfilePage() {
           <Card className="border-none shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="font-headline font-bold">Active Listings</CardTitle>
-                <CardDescription>Items you are currently selling</CardDescription>
+                <CardTitle className="font-headline font-bold">My Marketplace</CardTitle>
+                <CardDescription>Your posted items</CardDescription>
               </div>
-              <Button size="sm" className="rounded-full">View All</Button>
+              <Link href="/my-listings">
+                <Button size="sm" variant="ghost" className="rounded-full">Manage All</Button>
+              </Link>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 border-2 border-dashed rounded-xl">
                 <div className="bg-secondary p-4 rounded-full">
-                  <GraduationCap className="h-8 w-8 text-primary" />
+                  <Package className="h-8 w-8 text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-bold">No active listings yet</h4>
+                  <h4 className="font-bold">No active items</h4>
                   <p className="text-sm text-muted-foreground max-w-xs">
-                    Clear out your dorm and help another student!
+                    Clean out your room and help the campus community!
                   </p>
                 </div>
-                <Button variant="outline" size="sm">Create Listing</Button>
+                <Link href="/post">
+                  <Button variant="outline" size="sm">List New Item</Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -12,11 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { 
   GoogleAuthProvider, 
-  signInWithRedirect 
+  signInWithPopup 
 } from "firebase/auth";
 import { useAuth } from "@/firebase";
 import { LogIn, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface AuthModalProps {
   children?: React.ReactNode;
@@ -27,6 +29,7 @@ interface AuthModalProps {
 export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
   const auth = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -34,18 +37,26 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
     
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
     
     try {
-      // Switched to signInWithRedirect as requested
-      await signInWithRedirect(auth, provider);
-      // Logic for user profile creation is now handled centrally in FirebaseProvider
-      // to accommodate the page reload that happens with redirects.
+      const result = await signInWithPopup(auth, provider);
+      toast({
+        title: "Welcome!",
+        description: `Signed in as ${result.user.displayName}`,
+      });
+      if (onOpenChange) onOpenChange(false);
+      router.push('/browsegillu');
     } catch (error: any) {
+      console.error("Auth error:", error);
       toast({
         variant: "destructive",
         title: "Authentication Failed",
         description: error.message || "Failed to sign in with Google.",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -108,8 +119,8 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
           </div>
           
           <p className="text-center text-xs text-muted-foreground leading-relaxed">
-            By continuing, you agree to our Terms of Service and Privacy Policy. 
             Access is restricted to verified campus communities.
+            Ensure you use your official college account.
           </p>
         </div>
       </DialogContent>
