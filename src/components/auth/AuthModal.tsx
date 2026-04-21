@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { 
   GoogleAuthProvider, 
-  signInWithRedirect 
+  signInWithPopup 
 } from "firebase/auth";
 import { useAuth } from "@/firebase";
 import { LogIn, Loader2 } from "lucide-react";
@@ -27,7 +27,7 @@ interface AuthModalProps {
 
 /**
  * A modal for user authentication.
- * Uses signInWithRedirect for compatibility with cloud workstation environments.
+ * Uses signInWithPopup as requested for immediate interaction.
  */
 export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
   const auth = useAuth();
@@ -44,16 +44,22 @@ export function AuthModal({ children, open, onOpenChange }: AuthModalProps) {
     });
     
     try {
-      // Use Redirect instead of Popup for cloud development environments
-      // This initiates the redirect to the Google login page.
-      await signInWithRedirect(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      if (result.user) {
+        toast({
+          title: "Welcome!",
+          description: `Successfully signed in as ${result.user.displayName}`,
+        });
+        if (onOpenChange) onOpenChange(false);
+      }
     } catch (error: any) {
       console.error("Auth error:", error);
       toast({
         variant: "destructive",
         title: "Authentication Failed",
-        description: error.message || "Failed to initiate sign-in.",
+        description: error.message || "Failed to sign in with Google.",
       });
+    } finally {
       setIsLoading(false);
     }
   };
